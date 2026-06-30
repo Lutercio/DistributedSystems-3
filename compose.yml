@@ -1,0 +1,189 @@
+name: distributed-systems
+
+x-eureka-environment: &eureka-environment
+  EUREKA_PEERS: http://eureka-1:8761/eureka/,http://eureka-2:8761/eureka/,http://eureka-3:8761/eureka/
+  CONFIG_SERVER_IMPORT: configserver:http://config-server:8888
+  CONFIG_SERVER_FAIL_FAST: "true"
+
+x-eureka-common: &eureka-common
+  image: distributed-systems/eureka:local
+  build:
+    context: ./EurekaServer
+    dockerfile: Dockerfile
+  restart: unless-stopped
+  networks:
+    - discovery
+  depends_on:
+    config-server:
+      condition: service_healthy
+  healthcheck:
+    test: ["CMD-SHELL", "wget -q -O - http://localhost:8761/actuator/health | grep -q '\"status\":\"UP\"'"]
+    interval: 10s
+    timeout: 5s
+    retries: 12
+    start_period: 30s
+  stop_grace_period: 20s
+
+x-gateway-environment: &gateway-environment
+  CONFIG_SERVER_IMPORT: configserver:http://config-server:8888
+  CONFIG_SERVER_FAIL_FAST: "true"
+  EUREKA_CLIENT_URLS: http://eureka-cluster:8761/eureka/
+  ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+
+x-gateway-common: &gateway-common
+  image: distributed-systems/gateway:local
+  build:
+    context: ./APIGateway
+    dockerfile: Dockerfile
+  restart: unless-stopped
+  networks:
+    - discovery
+  depends_on:
+    config-server:
+      condition: service_healthy
+    eureka-cluster:
+      condition: service_started
+    zipkin:
+      condition: service_started
+  healthcheck:
+    test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+    interval: 10s
+    timeout: 5s
+    retries: 12
+    start_period: 30s
+  stop_grace_period: 20s
+
+services:
+  config-server:
+    image: distributed-systems/config-server:local
+    build:
+      context: .
+      dockerfile: ConfigServer/Dockerfile
+    environment:
+      CONFIG_GIT_URI: ${CONFIG_GIT_URI:-file:/config-repository}
+      CONFIG_GIT_SEARCH_PATHS: ${CONFIG_GIT_SEARCH_PATHS:-config,config/{application}}
+      CONFIG_GIT_DEFAULT_LABEL: ${CONFIG_GIT_DEFAULT_LABEL:-main}
+      SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME: ${CONFIG_GIT_USERNAME:-}
+      SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD: ${CONFIG_GIT_PASSWORD:-}
+    restart: unless-stopped
+    networks:
+      - discovery
+    ports:
+      - "127.0.0.1:8888:8888"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8888/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    stop_grace_period: 20s
+
+  eureka-1:
+    <<: *eureka-common
+    hostname: eureka-1
+    environment:
+      <<: *eureka-environment
+      EUREKA_HOSTNAME: eureka-1
+    ports:
+      - "127.0.0.1:8761:8761"
+
+  eureka-2:
+    <<: *eureka-common
+    hostname: eureka-2
+    environment:
+      <<: *eureka-environment
+      EUREKA_HOSTNAME: eureka-2
+    ports:
+      - "127.0.0.1:8762:8761"
+
+  eureka-3:
+    <<: *eureka-common
+    hostname: eureka-3
+    environment:
+      <<: *eureka-environment
+      EUREKA_HOSTNAME: eureka-3
+    ports:
+      - "127.0.0.1:8763:8761"
+
+  eureka-cluster:
+    image: haproxy:3.2.20-alpine
+    restart: unless-stopped
+    networks:
+      - discovery
+    depends_on:
+      eureka-1:
+        condition: service_started
+      eureka-2:
+        condition: service_started
+      eureka-3:
+        condition: service_started
+    volumes:
+      - ./infrastructure/haproxy/eureka.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    deploy:
+      replicas: 2
+    healthcheck:
+      test: ["CMD", "haproxy", "-c", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  gateway-1:
+    <<: *gateway-common
+    hostname: gateway-1
+    environment:
+      <<: *gateway-environment
+      EUREKA_INSTANCE_HOSTNAME: gateway-1
+
+  gateway-2:
+    <<: *gateway-common
+    hostname: gateway-2
+    environment:
+      <<: *gateway-environment
+      EUREKA_INSTANCE_HOSTNAME: gateway-2
+
+  gateway-edge:
+    image: haproxy:3.2.20-alpine
+    restart: unless-stopped
+    networks:
+      - discovery
+    depends_on:
+      gateway-1:
+        condition: service_started
+      gateway-2:
+        condition: service_started
+    volumes:
+      - ./infrastructure/haproxy/gateway.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "haproxy", "-c", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  prometheus:
+    image: prom/prometheus:v3.12.0
+    restart: unless-stopped
+    networks:
+      - discovery
+    depends_on:
+      gateway-1:
+        condition: service_started
+      gateway-2:
+        condition: service_started
+    volumes:
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "127.0.0.1:9090:9090"
+
+  zipkin:
+    image: openzipkin/zipkin:3.6.1
+    restart: unless-stopped
+    networks:
+      - discovery
+    ports:
+      - "127.0.0.1:9411:9411"
+
+networks:
+  discovery:
+    name: distributed-systems-discovery

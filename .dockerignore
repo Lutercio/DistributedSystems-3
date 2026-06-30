@@ -1,0 +1,10 @@
+.git/
+.idea/
+.md/
+.plan-cache/
+**/target/
+APIGateway/
+EurekaServer/
+infrastructure/
+**/HELP.md
+**/*.iml
