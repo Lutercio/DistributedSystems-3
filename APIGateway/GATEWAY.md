@@ -9,7 +9,9 @@ and discover downstream instances through the Eureka cluster endpoint.
 From the repository root:
 
 ```powershell
-docker compose up --build -d
+Copy-Item .env.example .env
+docker compose --env-file .env build
+docker compose --env-file .env up -d --no-build
 docker compose ps
 ```
 

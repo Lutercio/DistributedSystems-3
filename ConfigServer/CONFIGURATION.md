@@ -1,9 +1,11 @@
 # Centralized configuration with Spring Cloud Config
 
-The Config Server uses a Git environment repository. The Docker image creates
-an initial `main` branch from the tracked files under `config-repository/`, so
-the local stack is runnable without external credentials while still using the
-same versioned backend model as a remote Git repository.
+The Config Server uses a Git environment repository supplied through
+`CONFIG_GIT_URI`. Configuration is deliberately not copied into the application
+image, so the same release artifact can be promoted through every environment.
+For local development, Compose seeds `config-repository/` into a separate,
+internal Git-over-HTTP backing service. A deployed environment replaces only
+`CONFIG_GIT_URI` with its remote repository URL.
 
 The repository is organized by application:
 
@@ -20,7 +22,9 @@ service settings are returned by Config Server according to the requested
 From the repository root:
 
 ```powershell
-docker compose up --build -d
+Copy-Item .env.example .env
+docker compose --env-file .env build
+docker compose --env-file .env up -d --no-build
 docker compose ps
 ```
 
@@ -35,16 +39,17 @@ Invoke-RestMethod http://localhost:8888/gateway/default/main
 The Eureka containers wait for a healthy Config Server and use fail-fast,
 timeouts, and retry during bootstrap.
 
-## Use a remote Git repository
+## Configure the Git repository
 
 Set these variables before starting Compose:
 
 ```powershell
-$env:CONFIG_GIT_URI = 'https://example.com/organization/config-repository.git'
-$env:CONFIG_GIT_DEFAULT_LABEL = 'main'
-$env:CONFIG_GIT_USERNAME = '<username>'
-$env:CONFIG_GIT_PASSWORD = '<token-or-password>'
-docker compose up --build -d
+# For a deployed environment, edit the corresponding values in .env:
+# CONFIG_GIT_URI=https://example.com/organization/config-repository.git
+# CONFIG_GIT_DEFAULT_LABEL=release-0.0.1
+# CONFIG_GIT_USERNAME=<username>
+# CONFIG_GIT_PASSWORD=<token-or-password>
+docker compose --env-file .env up -d --no-build
 ```
 
 Do not commit credentials. For a public repository, leave the username and

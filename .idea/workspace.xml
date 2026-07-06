@@ -5,26 +5,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3bc8c164-6799-4bd6-a44d-6e47a28bc66b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.md/Descrio_do_Terceiro_Trabalho_Pratico.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.md/Spring_Discovery_Service.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/APIGateway/.gitattributes" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/APIGateway/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/APIGateway/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/APIGateway/mvnw" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/APIGateway/mvnw.cmd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/APIGateway/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/APIGateway/src/main/java/com/distributed_systems/gateway/GatewayApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/APIGateway/src/main/resources/application.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/APIGateway/src/test/java/com/distributed_systems/gateway/GatewayApplicationTests.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConfigServer/.gitattributes" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConfigServer/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConfigServer/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConfigServer/mvnw" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConfigServer/mvnw.cmd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConfigServer/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConfigServer/src/main/java/com/distributed_systems/config/ConfigApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConfigServer/src/main/resources/application.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConfigServer/src/test/java/com/distributed_systems/config/ConfigApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/GATEWAY.md" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/GATEWAY.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/src/test/java/com/distributed_systems/gateway/GatewayApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/src/test/java/com/distributed_systems/gateway/GatewayApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigServer/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigServer/CONFIGURATION.md" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/CONFIGURATION.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigServer/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigServer/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigServer/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigServer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigServer/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigServer/src/test/java/com/distributed_systems/config/ConfigApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/src/test/java/com/distributed_systems/config/ConfigApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EurekaServer/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/EurekaServer/CLUSTER.md" beforeDir="false" afterPath="$PROJECT_DIR$/EurekaServer/CLUSTER.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EurekaServer/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/EurekaServer/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EurekaServer/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/EurekaServer/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/EurekaServer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/EurekaServer/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EurekaServer/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/EurekaServer/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EurekaServer/src/test/java/com/distributed_systems/eureka/EurekaApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/EurekaServer/src/test/java/com/distributed_systems/eureka/EurekaApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config-repository/config/eureka-server/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config-repository/config/eureka-server/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config-repository/config/gateway/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config-repository/config/gateway/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infrastructure/prometheus/prometheus.yml" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/prometheus/prometheus.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +43,13 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7,
@@ -107,7 +124,10 @@
       <workItem from="1782408465392" duration="2498000" />
       <workItem from="1782664437085" duration="1273000" />
       <workItem from="1782667916493" duration="11827000" />
-      <workItem from="1782767945380" duration="3741000" />
+      <workItem from="1782767945380" duration="4676000" />
+      <workItem from="1782842057614" duration="8440000" />
+      <workItem from="1783051515427" duration="2000" />
+      <workItem from="1783195443809" duration="1436000" />
     </task>
     <servers />
   </component>

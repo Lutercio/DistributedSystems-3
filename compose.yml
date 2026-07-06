@@ -1,15 +1,18 @@
 name: distributed-systems
 
 x-eureka-environment: &eureka-environment
-  EUREKA_PEERS: http://eureka-1:8761/eureka/,http://eureka-2:8761/eureka/,http://eureka-3:8761/eureka/
-  CONFIG_SERVER_IMPORT: configserver:http://config-server:8888
-  CONFIG_SERVER_FAIL_FAST: "true"
+  PORT: "8761"
+  EUREKA_PEERS: ${EUREKA_PEERS:?Set EUREKA_PEERS in .env}
+  CONFIG_SERVER_URL: ${CONFIG_SERVER_URL:?Set CONFIG_SERVER_URL in .env}
 
 x-eureka-common: &eureka-common
-  image: distributed-systems/eureka:local
+  image: distributed-systems/eureka:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
   build:
-    context: ./EurekaServer
-    dockerfile: Dockerfile
+    context: .
+    dockerfile: EurekaServer/Dockerfile
+    args:
+      RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+      BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
   restart: unless-stopped
   networks:
     - discovery
@@ -22,19 +25,23 @@ x-eureka-common: &eureka-common
     timeout: 5s
     retries: 12
     start_period: 30s
-  stop_grace_period: 20s
+  stop_grace_period: 25s
 
 x-gateway-environment: &gateway-environment
-  CONFIG_SERVER_IMPORT: configserver:http://config-server:8888
-  CONFIG_SERVER_FAIL_FAST: "true"
-  EUREKA_CLIENT_URLS: http://eureka-cluster:8761/eureka/
-  ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+  PORT: "8080"
+  CONFIG_SERVER_URL: ${CONFIG_SERVER_URL:?Set CONFIG_SERVER_URL in .env}
+  EUREKA_URL: ${EUREKA_URL:?Set EUREKA_URL in .env}
+  ZIPKIN_ENDPOINT: ${ZIPKIN_ENDPOINT:?Set ZIPKIN_ENDPOINT in .env}
+  TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY:?Set TRACING_SAMPLING_PROBABILITY in .env}
 
 x-gateway-common: &gateway-common
-  image: distributed-systems/gateway:local
+  image: distributed-systems/gateway:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
   build:
-    context: ./APIGateway
-    dockerfile: Dockerfile
+    context: .
+    dockerfile: APIGateway/Dockerfile
+    args:
+      RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+      BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
   restart: unless-stopped
   networks:
     - discovery
@@ -51,32 +58,153 @@ x-gateway-common: &gateway-common
     timeout: 5s
     retries: 12
     start_period: 30s
-  stop_grace_period: 20s
+  stop_grace_period: 25s
+
+x-observed-service-environment: &observed-service-environment
+  CONFIG_SERVER_URL: ${CONFIG_SERVER_URL:?Set CONFIG_SERVER_URL in .env}
+  EUREKA_URL: ${EUREKA_URL:?Set EUREKA_URL in .env}
+  ZIPKIN_ENDPOINT: ${ZIPKIN_ENDPOINT:?Set ZIPKIN_ENDPOINT in .env}
+  TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY:?Set TRACING_SAMPLING_PROBABILITY in .env}
+
+x-question-service-common: &question-service-common
+  image: distributed-systems/question-service:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+  build:
+    context: .
+    dockerfile: QuestionService/Dockerfile
+    args:
+      RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+      BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
+  restart: unless-stopped
+  networks:
+    - discovery
+  depends_on:
+    config-server:
+      condition: service_healthy
+    eureka-cluster:
+      condition: service_started
+    rag-service-1:
+      condition: service_started
+    rag-service-2:
+      condition: service_started
+    question-normalizer:
+      condition: service_started
+  healthcheck:
+    test: ["CMD-SHELL", "wget -q -O - http://localhost:8081/actuator/health | grep -q '\"status\":\"UP\"'"]
+    interval: 10s
+    timeout: 5s
+    retries: 12
+    start_period: 30s
+  stop_grace_period: 25s
+
+x-rag-service-common: &rag-service-common
+  image: distributed-systems/rag-service:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+  build:
+    context: .
+    dockerfile: RagService/Dockerfile
+    args:
+      RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+      BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
+  restart: unless-stopped
+  networks:
+    - discovery
+  depends_on:
+    config-server:
+      condition: service_healthy
+    eureka-cluster:
+      condition: service_started
+    zipkin:
+      condition: service_started
+  healthcheck:
+    test: ["CMD-SHELL", "wget -q -O - http://localhost:8082/actuator/health | grep -q '\"status\":\"UP\"'"]
+    interval: 10s
+    timeout: 5s
+    retries: 12
+    start_period: 30s
+  stop_grace_period: 25s
 
 services:
+  config-git-init:
+    image: alpine/git:2.54.0@sha256:e043be20669db13cbcfb6190192babee4cf2dca98709bb0c2d08ca2d35a0a06a
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        rm -rf /tmp/config-source /srv/git/config.git.next
+        mkdir -p /tmp/config-source /srv/git
+        cp -R /seed/. /tmp/config-source/
+        cd /tmp/config-source
+        git init --initial-branch=main
+        git config user.name "Local Config Repository"
+        git config user.email "config-repository@localhost"
+        git add config
+        GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -m "Seed centralized configuration"
+        git clone --bare . /srv/git/config.git.next
+        git --git-dir=/srv/git/config.git.next symbolic-ref HEAD refs/heads/main
+        git --git-dir=/srv/git/config.git.next update-server-info
+        next_revision="$$(git --git-dir=/srv/git/config.git.next rev-parse refs/heads/main)"
+        current_revision=""
+        if [ -d /srv/git/config.git ]; then
+          current_revision="$$(git --git-dir=/srv/git/config.git rev-parse refs/heads/main 2>/dev/null || true)"
+        fi
+        if [ "$$current_revision" = "$$next_revision" ]; then
+          rm -rf /srv/git/config.git.next
+        else
+          rm -rf /srv/git/config.git
+          mv /srv/git/config.git.next /srv/git/config.git
+        fi
+    networks:
+      - discovery
+    volumes:
+      - ./config-repository:/seed:ro
+      - config-git-data:/srv/git
+    restart: "no"
+
+  config-git:
+    image: busybox:1.37.0@sha256:9532d8c39891ca2ecde4d30d7710e01fb739c87a8b9299685c63704296b16028
+    command: ["httpd", "-f", "-p", "80", "-h", "/srv/git"]
+    restart: unless-stopped
+    networks:
+      - discovery
+    volumes:
+      - config-git-data:/srv/git:ro
+    depends_on:
+      config-git-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost/config.git/info/refs | grep -q refs/heads/main"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
   config-server:
-    image: distributed-systems/config-server:local
+    image: distributed-systems/config-server:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
     build:
       context: .
       dockerfile: ConfigServer/Dockerfile
+      args:
+        RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+        BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
     environment:
-      CONFIG_GIT_URI: ${CONFIG_GIT_URI:-file:/config-repository}
-      CONFIG_GIT_SEARCH_PATHS: ${CONFIG_GIT_SEARCH_PATHS:-config,config/{application}}
-      CONFIG_GIT_DEFAULT_LABEL: ${CONFIG_GIT_DEFAULT_LABEL:-main}
+      PORT: "8888"
+      CONFIG_GIT_URI: ${CONFIG_GIT_URI:?Set CONFIG_GIT_URI in .env}
+      CONFIG_GIT_DEFAULT_LABEL: ${CONFIG_GIT_DEFAULT_LABEL:?Set CONFIG_GIT_DEFAULT_LABEL in .env}
       SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME: ${CONFIG_GIT_USERNAME:-}
       SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD: ${CONFIG_GIT_PASSWORD:-}
     restart: unless-stopped
     networks:
       - discovery
+    depends_on:
+      config-git:
+        condition: service_healthy
     ports:
-      - "127.0.0.1:8888:8888"
+      - "127.0.0.1:${CONFIG_SERVER_HOST_PORT:?Set CONFIG_SERVER_HOST_PORT in .env}:8888"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8888/actuator/health | grep -q '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 5s
       retries: 12
       start_period: 30s
-    stop_grace_period: 20s
+    stop_grace_period: 25s
 
   eureka-1:
     <<: *eureka-common
@@ -85,7 +213,7 @@ services:
       <<: *eureka-environment
       EUREKA_HOSTNAME: eureka-1
     ports:
-      - "127.0.0.1:8761:8761"
+      - "127.0.0.1:${EUREKA_1_HOST_PORT:?Set EUREKA_1_HOST_PORT in .env}:8761"
 
   eureka-2:
     <<: *eureka-common
@@ -94,7 +222,7 @@ services:
       <<: *eureka-environment
       EUREKA_HOSTNAME: eureka-2
     ports:
-      - "127.0.0.1:8762:8761"
+      - "127.0.0.1:${EUREKA_2_HOST_PORT:?Set EUREKA_2_HOST_PORT in .env}:8761"
 
   eureka-3:
     <<: *eureka-common
@@ -103,10 +231,10 @@ services:
       <<: *eureka-environment
       EUREKA_HOSTNAME: eureka-3
     ports:
-      - "127.0.0.1:8763:8761"
+      - "127.0.0.1:${EUREKA_3_HOST_PORT:?Set EUREKA_3_HOST_PORT in .env}:8761"
 
   eureka-cluster:
-    image: haproxy:3.2.20-alpine
+    image: haproxy:3.2.20-alpine@sha256:9f196dc9ec57310a1a430939221b33b36c14113497aca7ead9b13f4d5c2d37f5
     restart: unless-stopped
     networks:
       - discovery
@@ -141,8 +269,102 @@ services:
       <<: *gateway-environment
       EUREKA_INSTANCE_HOSTNAME: gateway-2
 
+  rag-service-1:
+    <<: *rag-service-common
+    hostname: rag-service-1
+    environment:
+      <<: *observed-service-environment
+      PORT: "8082"
+      EUREKA_INSTANCE_HOSTNAME: rag-service-1
+
+  rag-service-2:
+    <<: *rag-service-common
+    hostname: rag-service-2
+    environment:
+      <<: *observed-service-environment
+      PORT: "8082"
+      EUREKA_INSTANCE_HOSTNAME: rag-service-2
+
+  question-normalizer:
+    image: distributed-systems/question-normalizer:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+    build:
+      context: .
+      dockerfile: QuestionNormalizerFunction/Dockerfile
+      args:
+        RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+        BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
+    hostname: question-normalizer
+    environment:
+      <<: *observed-service-environment
+      PORT: "8083"
+      EUREKA_INSTANCE_HOSTNAME: question-normalizer
+    restart: unless-stopped
+    networks:
+      - discovery
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-cluster:
+        condition: service_started
+      zipkin:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8083/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    stop_grace_period: 25s
+
+  regulation-mcp:
+    image: distributed-systems/regulation-mcp:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+    build:
+      context: .
+      dockerfile: RegulationMcpServer/Dockerfile
+      args:
+        RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
+        BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
+    hostname: regulation-mcp
+    environment:
+      <<: *observed-service-environment
+      PORT: "8084"
+      EUREKA_INSTANCE_HOSTNAME: regulation-mcp
+    restart: unless-stopped
+    networks:
+      - discovery
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-cluster:
+        condition: service_started
+      zipkin:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8084/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    stop_grace_period: 25s
+
+  question-service-1:
+    <<: *question-service-common
+    hostname: question-service-1
+    environment:
+      <<: *observed-service-environment
+      PORT: "8081"
+      EUREKA_INSTANCE_HOSTNAME: question-service-1
+
+  question-service-2:
+    <<: *question-service-common
+    hostname: question-service-2
+    environment:
+      <<: *observed-service-environment
+      PORT: "8081"
+      EUREKA_INSTANCE_HOSTNAME: question-service-2
+
   gateway-edge:
-    image: haproxy:3.2.20-alpine
+    image: haproxy:3.2.20-alpine@sha256:9f196dc9ec57310a1a430939221b33b36c14113497aca7ead9b13f4d5c2d37f5
     restart: unless-stopped
     networks:
       - discovery
@@ -154,7 +376,7 @@ services:
     volumes:
       - ./infrastructure/haproxy/gateway.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:${GATEWAY_HOST_PORT:?Set GATEWAY_HOST_PORT in .env}:8080"
     healthcheck:
       test: ["CMD", "haproxy", "-c", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
       interval: 10s
@@ -162,7 +384,7 @@ services:
       retries: 3
 
   prometheus:
-    image: prom/prometheus:v3.12.0
+    image: prom/prometheus:v3.12.0@sha256:69f5241418838263316593f7274a304b095c40bcf22e57272865da91bd60a8ac
     restart: unless-stopped
     networks:
       - discovery
@@ -171,19 +393,35 @@ services:
         condition: service_started
       gateway-2:
         condition: service_started
+      question-service-1:
+        condition: service_started
+      question-service-2:
+        condition: service_started
+      rag-service-1:
+        condition: service_started
+      rag-service-2:
+        condition: service_started
+      question-normalizer:
+        condition: service_started
+      regulation-mcp:
+        condition: service_started
     volumes:
       - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
-      - "127.0.0.1:9090:9090"
+      - "127.0.0.1:${PROMETHEUS_HOST_PORT:?Set PROMETHEUS_HOST_PORT in .env}:9090"
 
   zipkin:
-    image: openzipkin/zipkin:3.6.1
+    image: openzipkin/zipkin:3.6.1@sha256:d17e856dcbba7ffeefbbfc252f89ab78a4ab6faed47e646d46daad78f91b5ee2
     restart: unless-stopped
     networks:
       - discovery
     ports:
-      - "127.0.0.1:9411:9411"
+      - "127.0.0.1:${ZIPKIN_HOST_PORT:?Set ZIPKIN_HOST_PORT in .env}:9411"
 
 networks:
   discovery:
     name: distributed-systems-discovery
+
+volumes:
+  config-git-data:
+    name: distributed-systems-config-git

@@ -11,3 +11,23 @@ scrape_configs:
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: ["gateway-1:8080", "gateway-2:8080"]
+
+  - job_name: question-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["question-service-1:8081", "question-service-2:8081"]
+
+  - job_name: rag-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["rag-service-1:8082", "rag-service-2:8082"]
+
+  - job_name: question-normalizer
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["question-normalizer:8083"]
+
+  - job_name: regulation-mcp
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["regulation-mcp:8084"]

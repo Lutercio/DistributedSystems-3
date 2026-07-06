@@ -1,0 +1,30 @@
+type Query {
+	serviceStatus: String!
+}
+
+type Mutation {
+	askQuestion(input: AskQuestionInput!): Answer!
+}
+
+input AskQuestionInput {
+	conversationId: ID!
+	question: String!
+	verifyOfficialSource: Boolean!
+}
+
+type Answer {
+	conversationId: ID!
+	answer: String!
+	grounded: Boolean!
+	verifiedOnline: Boolean!
+	sources: [Source!]!
+	toolsUsed: [String!]!
+	timestamp: String!
+}
+
+type Source {
+	documentTitle: String!
+	article: String!
+	excerpt: String!
+	officialUrl: String!
+}

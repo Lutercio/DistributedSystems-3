@@ -11,6 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest(properties = {
 		"server.port=0",
+		"PORT=0",
+		"CONFIG_GIT_URI=file:../config-repository",
+		"CONFIG_GIT_DEFAULT_LABEL=main",
 		"spring.profiles.active=native",
 		"spring.cloud.config.server.native.search-locations=file:../config-repository/config,file:../config-repository/config/{application}"
 })

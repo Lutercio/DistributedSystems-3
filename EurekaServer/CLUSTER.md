@@ -18,7 +18,9 @@ the Eureka client using the configured cluster URLs.
 From the repository root:
 
 ```powershell
-docker compose up --build -d
+Copy-Item .env.example .env
+docker compose --env-file .env build
+docker compose --env-file .env up -d --no-build
 docker compose ps
 ```
 
@@ -29,13 +31,9 @@ at:
 - <http://localhost:8762>
 - <http://localhost:8763>
 
-The gateway defaults to all three published URLs. Start it from another
-terminal:
-
-```powershell
-cd APIGateway
-.\mvnw.cmd spring-boot:run
-```
+Gateway instances receive one attached-resource URL,
+`http://eureka-cluster:8761/eureka/`. The replicated HAProxy service selects a
+healthy registry peer; the direct peer list remains private to Eureka.
 
 After Eureka's registration interval, `GATEWAY` should be visible on every
 dashboard. The registry can also be queried directly:

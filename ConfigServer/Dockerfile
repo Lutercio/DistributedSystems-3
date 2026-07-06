@@ -1,33 +1,33 @@
-FROM maven:3.9.16-eclipse-temurin-26-alpine AS build
+FROM maven:3.9.16-eclipse-temurin-26-alpine@sha256:17f5fa1caa0908f91a130d13a54137770e61b2b221220c008a35d86a21666959 AS build
 
 WORKDIR /workspace
 
-COPY ConfigServer/pom.xml ./pom.xml
-RUN mvn --batch-mode --no-transfer-progress dependency:go-offline
+COPY pom.xml ./pom.xml
+COPY APIGateway/pom.xml ./APIGateway/pom.xml
+COPY ConfigServer/pom.xml ./ConfigServer/pom.xml
+COPY EurekaServer/pom.xml ./EurekaServer/pom.xml
+COPY QuestionService/pom.xml ./QuestionService/pom.xml
+COPY RagService/pom.xml ./RagService/pom.xml
+COPY QuestionNormalizerFunction/pom.xml ./QuestionNormalizerFunction/pom.xml
+COPY RegulationMcpServer/pom.xml ./RegulationMcpServer/pom.xml
+RUN mvn --batch-mode --no-transfer-progress -pl ConfigServer -am dependency:go-offline
 
-COPY ConfigServer/src ./src
-RUN mvn --batch-mode --no-transfer-progress -DskipTests package
+COPY ConfigServer/src ./ConfigServer/src
+RUN mvn --batch-mode --no-transfer-progress -pl ConfigServer -am -DskipTests package
 
-FROM eclipse-temurin:26-jre-alpine
+FROM eclipse-temurin:26-jre-alpine@sha256:c4a22bec4f4368636abb9b6fe2b2350fd7fae1ec0d3bf43fcaae1be720c3bbd1
+
+ARG RELEASE_VERSION=0.0.1
+ARG BUILD_REVISION=unknown
 
 RUN addgroup -S spring && adduser -S spring -G spring
 
 WORKDIR /app
-COPY --from=build /workspace/target/config-*.jar app.jar
-COPY config-repository /config-repository
+COPY --from=build /workspace/ConfigServer/target/config-*.jar app.jar
 
-RUN apk add --no-cache git \
-    && cd /config-repository \
-    && git init -b main \
-    && git config user.name "Config Server" \
-    && git config user.email "config-server@localhost" \
-    && git add . \
-    && git commit -m "Seed centralized configuration" \
-    && apk del git \
-    && mkdir -p /home/spring/.config/jgit \
-    && chown -R spring:spring /home/spring /config-repository
-
-ENV XDG_CONFIG_HOME=/home/spring/.config
+LABEL org.opencontainers.image.title="Distributed Systems Config Server" \
+      org.opencontainers.image.version="${RELEASE_VERSION}" \
+      org.opencontainers.image.revision="${BUILD_REVISION}"
 
 USER spring:spring
 
