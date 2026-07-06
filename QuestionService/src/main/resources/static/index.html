@@ -54,7 +54,7 @@
 				verifyOfficialSource: document.querySelector('#verify').checked
 			};
 			try {
-				const response = await fetch('api/questions', {
+				const response = await fetch('./api/questions', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(payload)
@@ -62,7 +62,17 @@
 				const body = await response.json();
 				if (!response.ok) throw new Error(body.message || 'Não foi possível obter a resposta.');
 				conversationInput.value = body.conversationId;
-				result.innerHTML = `<p>${escapeHtml(body.answer)}</p><p class="meta">Conversa: ${escapeHtml(body.conversationId)} · Resposta fundamentada: ${body.grounded ? 'sim' : 'não'}</p>`;
+				const sources = (body.sources || []).map(source =>
+					`<li><strong>${escapeHtml(source.article)}</strong>: ${escapeHtml(source.excerpt)} ` +
+					`<a href="${escapeHtml(source.officialUrl)}" target="_blank" rel="noreferrer">fonte oficial</a></li>`
+				).join('');
+				const tools = (body.toolsUsed || []).map(escapeHtml).join(', ') || 'nenhuma';
+				result.innerHTML = `<p>${escapeHtml(body.answer)}</p>` +
+					(sources ? `<h2>Fontes</h2><ul>${sources}</ul>` : '') +
+					`<p class="meta">Conversa: ${escapeHtml(body.conversationId)} · ` +
+					`Resposta fundamentada: ${body.grounded ? 'sim' : 'não'} · ` +
+					`Fonte verificada online: ${body.verifiedOnline ? 'sim' : 'não'} · ` +
+					`Ferramentas: ${tools}</p>`;
 			} catch (error) {
 				result.className = 'error';
 				result.textContent = error.message;

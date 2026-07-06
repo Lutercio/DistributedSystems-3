@@ -15,6 +15,8 @@ import com.distributed_systems.question.api.ApiErrorResponse;
 import com.distributed_systems.question.client.DownstreamServiceException;
 import com.distributed_systems.question.service.InvalidQuestionException;
 
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+
 @RestControllerAdvice
 class ApiExceptionHandler {
 
@@ -54,6 +56,17 @@ class ApiExceptionHandler {
 				HttpStatus.SERVICE_UNAVAILABLE,
 				"RAG_SERVICE_UNAVAILABLE",
 				exception.getMessage(),
+				List.of(),
+				exchange
+		);
+	}
+
+	@ExceptionHandler(RequestNotPermitted.class)
+	ResponseEntity<ApiErrorResponse> handleRateLimit(RequestNotPermitted exception, ServerWebExchange exchange) {
+		return response(
+				HttpStatus.TOO_MANY_REQUESTS,
+				"RATE_LIMIT_EXCEEDED",
+				"Question capacity is temporarily exhausted",
 				List.of(),
 				exchange
 		);

@@ -31,6 +31,8 @@
 	<properties>
 		<java.version>26</java.version>
 		<spring-cloud.version>2025.1.2</spring-cloud.version>
+		<spring-ai.version>2.0.0</spring-ai.version>
+		<testcontainers.version>2.0.5</testcontainers.version>
 		<project.build.outputTimestamp>2026-06-30T00:00:00Z</project.build.outputTimestamp>
 		<maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
 		<maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
@@ -42,10 +44,28 @@
 		<httpclient.version>4.5.14</httpclient.version>
 		<joda-time.version>2.12.7</joda-time.version>
 		<woodstox.version>7.1.1</woodstox.version>
+		<antlr-runtime.version>3.5.3</antlr-runtime.version>
+		<json-schema-validator.version>3.0.1</json-schema-validator.version>
+		<jsonschema-generator.version>5.0.0</jsonschema-generator.version>
+		<pdfbox.version>3.0.7</pdfbox.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainers.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
@@ -77,6 +97,36 @@
 				<groupId>com.fasterxml.woodstox</groupId>
 				<artifactId>woodstox-core</artifactId>
 				<version>${woodstox.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr-runtime</artifactId>
+				<version>${antlr-runtime.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.networknt</groupId>
+				<artifactId>json-schema-validator</artifactId>
+				<version>${json-schema-validator.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.victools</groupId>
+				<artifactId>jsonschema-generator</artifactId>
+				<version>${jsonschema-generator.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.pdfbox</groupId>
+				<artifactId>pdfbox</artifactId>
+				<version>${pdfbox.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.victools</groupId>
+				<artifactId>jsonschema-module-jackson</artifactId>
+				<version>${jsonschema-generator.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.victools</groupId>
+				<artifactId>jsonschema-module-swagger-2</artifactId>
+				<version>${jsonschema-generator.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

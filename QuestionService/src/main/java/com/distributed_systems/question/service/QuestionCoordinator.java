@@ -13,16 +13,19 @@ import com.distributed_systems.question.client.RagAnswer;
 import com.distributed_systems.question.client.RagClient;
 
 import reactor.core.publisher.Mono;
+import io.micrometer.core.instrument.MeterRegistry;
 
 @Service
 public class QuestionCoordinator {
 
 	private final NormalizerClient normalizerClient;
 	private final RagClient ragClient;
+	private final MeterRegistry meterRegistry;
 
-	QuestionCoordinator(NormalizerClient normalizerClient, RagClient ragClient) {
+	QuestionCoordinator(NormalizerClient normalizerClient, RagClient ragClient, MeterRegistry meterRegistry) {
 		this.normalizerClient = normalizerClient;
 		this.ragClient = ragClient;
+		this.meterRegistry = meterRegistry;
 	}
 
 	public Mono<QuestionResponse> ask(QuestionRequest request, String correlationId) {
@@ -31,7 +34,10 @@ public class QuestionCoordinator {
 				: request.conversationId();
 
 		return normalizerClient.normalize(request.question(), correlationId)
-				.onErrorReturn(NormalizationResponse.fallback(request.question()))
+				.onErrorResume(error -> {
+					meterRegistry.counter("question.normalizer.fallbacks").increment();
+					return Mono.just(NormalizationResponse.fallback(request.question()));
+				})
 				.flatMap(normalized -> requireValid(normalized)
 						.then(Mono.defer(() -> ragClient.ask(
 								conversationId,

@@ -1,0 +1,8 @@
+[
+  {"id":"trancamento","question":"Como funciona o trancamento de programa?","expectedArticles":["120"],"kind":"grounded"},
+  {"id":"follow-up","question":"E quais sao os efeitos disso?","requiresPrevious":"trancamento","kind":"memory"},
+  {"id":"exact-article","question":"Mostre o artigo 1 do regulamento.","expectedTool":"buscar_artigo","kind":"mcp"},
+  {"id":"ambiguous","question":"Posso cancelar?","expectedBehavior":"ask_for_clarification","kind":"ambiguous"},
+  {"id":"outside-corpus","question":"Qual sera a previsao do tempo amanhã?","expectedGrounded":false,"kind":"refusal"},
+  {"id":"official-source","question":"Verifique se a fonte oficial do regulamento esta online.","verifyOfficialSource":true,"expectedTool":"tavily-search","kind":"mcp"}
+]

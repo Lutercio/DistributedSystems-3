@@ -13,6 +13,7 @@ import com.distributed_systems.question.client.RagClient;
 import com.distributed_systems.question.client.RagSource;
 
 import reactor.core.publisher.Mono;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,7 +27,9 @@ class QuestionCoordinatorTests {
 
 	private final NormalizerClient normalizerClient = mock(NormalizerClient.class);
 	private final RagClient ragClient = mock(RagClient.class);
-	private final QuestionCoordinator coordinator = new QuestionCoordinator(normalizerClient, ragClient);
+	private final QuestionCoordinator coordinator = new QuestionCoordinator(
+			normalizerClient, ragClient, new SimpleMeterRegistry()
+	);
 
 	@Test
 	void preservesConversationIdAndMapsAnswer() {

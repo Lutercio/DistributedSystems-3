@@ -114,6 +114,10 @@ x-rag-service-common: &rag-service-common
       condition: service_started
     zipkin:
       condition: service_started
+    postgres:
+      condition: service_healthy
+    regulation-mcp:
+      condition: service_healthy
   healthcheck:
     test: ["CMD-SHELL", "wget -q -O - http://localhost:8082/actuator/health | grep -q '\"status\":\"UP\"'"]
     interval: 10s
@@ -123,6 +127,24 @@ x-rag-service-common: &rag-service-common
   stop_grace_period: 25s
 
 services:
+  postgres:
+    image: pgvector/pgvector:0.8.2-pg17-trixie
+    restart: unless-stopped
+    networks:
+      - discovery
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
   config-git-init:
     image: alpine/git:2.54.0@sha256:e043be20669db13cbcfb6190192babee4cf2dca98709bb0c2d08ca2d35a0a06a
     entrypoint: ["/bin/sh", "-ec"]
@@ -276,6 +298,13 @@ services:
       <<: *observed-service-environment
       PORT: "8082"
       EUREKA_INSTANCE_HOSTNAME: rag-service-1
+      POSTGRES_URL: ${POSTGRES_URL:?Set POSTGRES_URL in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set OPENAI_API_KEY in .env}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:?Set TAVILY_API_KEY in .env}
+      OPENAI_MAX_CONCURRENT_CALLS: ${OPENAI_MAX_CONCURRENT_CALLS:-10}
+      OPENAI_LIMIT_FOR_PERIOD: ${OPENAI_LIMIT_FOR_PERIOD:-20}
 
   rag-service-2:
     <<: *rag-service-common
@@ -284,6 +313,32 @@ services:
       <<: *observed-service-environment
       PORT: "8082"
       EUREKA_INSTANCE_HOSTNAME: rag-service-2
+      POSTGRES_URL: ${POSTGRES_URL:?Set POSTGRES_URL in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set OPENAI_API_KEY in .env}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:?Set TAVILY_API_KEY in .env}
+      OPENAI_MAX_CONCURRENT_CALLS: ${OPENAI_MAX_CONCURRENT_CALLS:-10}
+      OPENAI_LIMIT_FOR_PERIOD: ${OPENAI_LIMIT_FOR_PERIOD:-20}
+
+  rag-ingestion:
+    <<: *rag-service-common
+    profiles: ["admin"]
+    hostname: rag-ingestion
+    restart: "no"
+    environment:
+      <<: *observed-service-environment
+      PORT: "8082"
+      EUREKA_INSTANCE_HOSTNAME: rag-ingestion
+      POSTGRES_URL: ${POSTGRES_URL:?Set POSTGRES_URL in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set OPENAI_API_KEY in .env}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:?Set TAVILY_API_KEY in .env}
+      APP_INGESTION_ENABLED: "true"
+      APP_INGESTION_EXIT_ON_COMPLETION: "true"
+      SPRING_AI_MCP_CLIENT_ENABLED: "false"
+      SPRING_AI_OPENAI_CHAT_ENABLED: "false"
 
   question-normalizer:
     image: distributed-systems/question-normalizer:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
@@ -410,6 +465,25 @@ services:
     ports:
       - "127.0.0.1:${PROMETHEUS_HOST_PORT:?Set PROMETHEUS_HOST_PORT in .env}:9090"
 
+  grafana:
+    image: grafana/grafana:13.1.0
+    restart: unless-stopped
+    networks:
+      - discovery
+    depends_on:
+      prometheus:
+        condition: service_started
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:?Set GRAFANA_ADMIN_USER in .env}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in .env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infrastructure/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "127.0.0.1:${GRAFANA_HOST_PORT:?Set GRAFANA_HOST_PORT in .env}:3000"
+
   zipkin:
     image: openzipkin/zipkin:3.6.1@sha256:d17e856dcbba7ffeefbbfc252f89ab78a4ab6faed47e646d46daad78f91b5ee2
     restart: unless-stopped
@@ -425,3 +499,7 @@ networks:
 volumes:
   config-git-data:
     name: distributed-systems-config-git
+  postgres-data:
+    name: distributed-systems-postgres
+  grafana-data:
+    name: distributed-systems-grafana

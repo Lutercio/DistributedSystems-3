@@ -24,6 +24,7 @@ RUN addgroup -S spring && adduser -S spring -G spring
 
 WORKDIR /app
 COPY --from=build /workspace/RagService/target/rag-service-*.jar app.jar
+COPY knowledge-base /knowledge-base
 
 LABEL org.opencontainers.image.title="UFRN Responde RAG Service" \
       org.opencontainers.image.version="${RELEASE_VERSION}" \

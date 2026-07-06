@@ -5,36 +5,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3bc8c164-6799-4bd6-a44d-6e47a28bc66b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APIGateway/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/APIGateway/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APIGateway/GATEWAY.md" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/GATEWAY.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APIGateway/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/APIGateway/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/APIGateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APIGateway/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APIGateway/src/test/java/com/distributed_systems/gateway/GatewayApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/src/test/java/com/distributed_systems/gateway/GatewayApplicationTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConfigServer/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConfigServer/CONFIGURATION.md" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/CONFIGURATION.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConfigServer/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConfigServer/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConfigServer/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConfigServer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConfigServer/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConfigServer/src/test/java/com/distributed_systems/config/ConfigApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/src/test/java/com/distributed_systems/config/ConfigApplicationTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EurekaServer/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EurekaServer/CLUSTER.md" beforeDir="false" afterPath="$PROJECT_DIR$/EurekaServer/CLUSTER.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EurekaServer/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/EurekaServer/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EurekaServer/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EurekaServer/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EurekaServer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/EurekaServer/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EurekaServer/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/EurekaServer/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EurekaServer/src/test/java/com/distributed_systems/eureka/EurekaApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/EurekaServer/src/test/java/com/distributed_systems/eureka/EurekaApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestionService/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/QuestionService/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestionService/src/main/java/com/distributed_systems/question/client/NormalizerClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/QuestionService/src/main/java/com/distributed_systems/question/client/NormalizerClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestionService/src/main/java/com/distributed_systems/question/client/RagClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/QuestionService/src/main/java/com/distributed_systems/question/client/RagClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestionService/src/main/java/com/distributed_systems/question/service/QuestionCoordinator.java" beforeDir="false" afterPath="$PROJECT_DIR$/QuestionService/src/main/java/com/distributed_systems/question/service/QuestionCoordinator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestionService/src/main/java/com/distributed_systems/question/web/ApiExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/QuestionService/src/main/java/com/distributed_systems/question/web/ApiExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestionService/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/QuestionService/src/main/resources/static/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestionService/src/test/java/com/distributed_systems/question/service/QuestionCoordinatorTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/QuestionService/src/test/java/com/distributed_systems/question/service/QuestionCoordinatorTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RagService/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RagService/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RagService/src/main/java/com/distributed_systems/rag/Answer.java" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/src/main/java/com/distributed_systems/rag/Answer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RagService/src/main/java/com/distributed_systems/rag/QuestionGraphQlController.java" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/src/main/java/com/distributed_systems/rag/QuestionGraphQlController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RagService/src/main/java/com/distributed_systems/rag/RagServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/src/main/java/com/distributed_systems/rag/RagServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RagService/src/test/java/com/distributed_systems/rag/QuestionGraphQlControllerTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/src/test/java/com/distributed_systems/rag/QuestionGraphQlControllerTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RagService/src/test/java/com/distributed_systems/rag/RagServiceApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/src/test/java/com/distributed_systems/rag/RagServiceApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RagService/src/test/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/src/test/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RegulationMcpServer/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/RegulationMcpServer/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RegulationMcpServer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/RegulationMcpServer/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RegulationMcpServer/src/test/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/RegulationMcpServer/src/test/resources/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config-repository/config/eureka-server/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config-repository/config/eureka-server/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config-repository/config/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config-repository/config/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config-repository/config/gateway/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config-repository/config/gateway/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/prometheus/prometheus.yml" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/prometheus/prometheus.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config-repository/config/question-service/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config-repository/config/question-service/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config-repository/config/rag-service/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config-repository/config/rag-service/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config-repository/config/regulation-mcp/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config-repository/config/regulation-mcp/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,6 +125,7 @@
       <workItem from="1782842057614" duration="8440000" />
       <workItem from="1783051515427" duration="2000" />
       <workItem from="1783195443809" duration="1436000" />
+      <workItem from="1783367074291" duration="1715000" />
     </task>
     <servers />
   </component>

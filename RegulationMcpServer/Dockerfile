@@ -24,6 +24,7 @@ RUN addgroup -S spring && adduser -S spring -G spring
 
 WORKDIR /app
 COPY --from=build /workspace/RegulationMcpServer/target/regulation-mcp-*.jar app.jar
+COPY knowledge-base /knowledge-base
 
 LABEL org.opencontainers.image.title="UFRN Responde Regulation MCP" \
       org.opencontainers.image.version="${RELEASE_VERSION}" \

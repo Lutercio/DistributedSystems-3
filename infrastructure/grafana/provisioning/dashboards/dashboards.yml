@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: UFRN Responde
+    orgId: 1
+    folder: UFRN Responde
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards

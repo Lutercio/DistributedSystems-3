@@ -7,6 +7,12 @@ import org.springframework.graphql.client.ClientGraphQlResponse;
 import org.springframework.graphql.client.HttpGraphQlClient;
 import org.springframework.stereotype.Component;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 import reactor.core.publisher.Mono;
 
 @Component
@@ -33,12 +39,17 @@ public class RagClient {
 
 	private final HttpGraphQlClient graphQlClient;
 	private final Duration timeout;
+	private final MeterRegistry meterRegistry;
 
-	RagClient(HttpGraphQlClient graphQlClient, DownstreamProperties properties) {
+	RagClient(HttpGraphQlClient graphQlClient, DownstreamProperties properties, MeterRegistry meterRegistry) {
 		this.graphQlClient = graphQlClient;
 		this.timeout = properties.ragTimeout();
+		this.meterRegistry = meterRegistry;
 	}
 
+	@CircuitBreaker(name = "ragService")
+	@Bulkhead(name = "ragService")
+	@RateLimiter(name = "ragService")
 	public Mono<RagAnswer> ask(
 			String conversationId,
 			String question,
@@ -58,7 +69,9 @@ public class RagClient {
 				.variable("input", input)
 				.execute()
 				.timeout(timeout)
-				.onErrorMap(error -> !(error instanceof DownstreamServiceException),
+				.doOnError(error -> meterRegistry.counter("question.downstream.failures", "service", "rag").increment())
+				.onErrorMap(error -> !(error instanceof DownstreamServiceException)
+						&& !(error instanceof RequestNotPermitted),
 						error -> new DownstreamServiceException("RagService is unavailable", error))
 				.flatMap(this::decodeAnswer);
 	}
