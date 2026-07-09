@@ -127,7 +127,8 @@ flowchart LR
     QS -->|"GraphQL sobre HTTP"| RS["RAG Service"]
 
     RS --> PG["PostgreSQL + PGVector"]
-    RS --> OA["OpenAI"]
+    RS --> OA["Groq"]
+    RS --> OL["Ollama"]
     RS --> OM["Regulation MCP Server"]
     RS --> TM["Tavily MCP"]
 
@@ -167,7 +168,7 @@ Responsabilidades:
 
 Nao deve:
 
-- acessar OpenAI;
+- acessar Groq e Ollama;
 - acessar PGVector;
 - implementar RAG;
 - armazenar memoria de conversa;
@@ -180,7 +181,7 @@ Microsservico responsavel por toda a integracao de IA.
 Responsabilidades:
 
 - expor servidor GraphQL interno;
-- integrar Spring AI com OpenAI;
+- integrar Spring AI com Groq e Ollama;
 - gerar embeddings da pergunta;
 - consultar PGVector;
 - montar o contexto RAG;
@@ -263,27 +264,28 @@ Autenticacao:
 - nao colocar a chave no repositorio, Config Server, logs, traces ou resposta;
 - evitar chave em query string, ainda que o Tavily ofereca essa opcao.
 
-## 8. Integracao OpenAI
+## 8. Integracao Groq e Ollama
 
 ### Versoes planejadas
 
 - Spring AI BOM: `2.0.0`;
-- modelo de chat: `gpt-5.4-mini-2026-03-17`;
-- modelo de embeddings: `text-embedding-3-small`;
-- dimensao padrao dos embeddings: 1536;
+- modelo de chat: `meta-llama/llama-4-scout-17b-16e-instruct` via Groq;
+- modelo de embeddings: `bge-m3:567m` via Ollama local;
+- dimensao padrao dos embeddings: 1024;
 - vector store: PostgreSQL com PGVector e indice HNSW por similaridade de cosseno.
 
 Razoes:
 
 - Spring AI 2.0.x suporta Spring Boot 4.0.x e 4.1.x;
-- o modelo mini reduz latencia e custo para JMeter;
-- o snapshot fixado melhora repetibilidade;
-- GPT-5.4 mini suporta Chat Completions, function calling e Structured Outputs;
-- `text-embedding-3-small` tem boa adequacao a busca multilingue e cabe no limite HNSW documentado pelo PGVector.
+- Groq oferece endpoint compativel com OpenAI e limite gratuito adequado ao desenvolvimento;
+- Llama 4 Scout suporta function calling e saida JSON;
+- BGE-M3 suporta portugues e mais de 100 idiomas, com contexto de ate 8192 tokens;
+- embeddings locais removem custo e quota externa da ingestao.
 
 ### Dependencias conceituais do `RagService`
 
-- Spring AI OpenAI starter;
+- Spring AI OpenAI starter, usado como cliente compativel para Groq;
+- Spring AI Ollama starter;
 - Spring AI PGVector starter;
 - Spring AI JDBC Chat Memory repository starter;
 - Spring AI MCP client WebFlux starter;
@@ -301,7 +303,7 @@ Razoes:
 
 Segredos fornecidos somente por ambiente:
 
-- `OPENAI_API_KEY`;
+- `GROQ_API_KEY`;
 - `TAVILY_API_KEY`;
 - credenciais do PostgreSQL.
 
@@ -321,25 +323,24 @@ Configuracao centralizada e versionada:
 
 Cuidados especificos:
 
-- nao configurar `temperature` para GPT-5.4 mini;
 - usar `max-completion-tokens`, inicialmente em torno de 300;
 - manter `n=1`;
 - reduzir o retry padrao do Spring AI de 10 tentativas para aproximadamente 2;
 - aplicar backoff curto e limitado;
 - nao repetir indefinidamente respostas 429 ou falhas permanentes;
-- consultar os limites reais da conta OpenAI antes dos testes de carga;
+- consultar os limites atuais do plano Groq antes dos testes de carga;
 - ativar metricas da camada de modelo e, se necessario, do connection pool.
 
 ### Fluxo de IA
 
 1. Receber `conversationId`, pergunta normalizada e `verifyOfficialSource`.
-2. Gerar embedding da pergunta com `text-embedding-3-small`.
+2. Gerar embedding da pergunta localmente com `bge-m3:567m`.
 3. Consultar PGVector com top-K e limiar configuraveis.
 4. Recuperar chunks e metadados de artigos.
 5. Adicionar memoria conversacional.
 6. Aplicar prompt de sistema.
 7. Disponibilizar ferramentas dos MCPs.
-8. Chamar GPT-5.4 mini.
+8. Chamar Llama 4 Scout pelo endpoint Groq.
 9. Executar eventual tool call.
 10. Devolver resultado da ferramenta ao modelo.
 11. Converter a saida para objeto estruturado.
@@ -521,7 +522,7 @@ Retry e seguro porque a funcao e idempotente.
 
 Nao repetir automaticamente a mutation porque isso pode duplicar memoria e consumo de tokens.
 
-### Chamada `RagService` -> OpenAI
+### Chamada `RagService` -> Groq
 
 - timeout inferior ao deadline do coordenador;
 - retry muito limitado apenas para falhas transitorias;
@@ -571,7 +572,7 @@ Metricas essenciais:
 - estado dos circuit breakers;
 - bulkhead ativo e rejeicoes;
 - rate limiter;
-- latencia OpenAI;
+- latencia Groq;
 - tokens de entrada e saida;
 - chamadas de embeddings;
 - respostas grounded e sem contexto;
@@ -590,7 +591,7 @@ Dashboard principal deve mostrar:
 4. instancias disponiveis;
 5. circuit breakers;
 6. bulkheads;
-7. latencia e tokens da OpenAI;
+7. latencia e tokens da Groq;
 8. falhas da funcao e dos MCPs.
 
 ### Tracing
@@ -599,7 +600,8 @@ Zipkin deve exibir:
 
 ```text
 Gateway -> QuestionService -> QuestionNormalizerFunction
-                           -> RagService -> OpenAI
+                           -> RagService -> Groq
+                                         -> Ollama
                                         -> RegulationMcpServer
                                         -> TavilyMcp
 ```
@@ -613,20 +615,11 @@ Gateway -> QuestionService -> QuestionNormalizerFunction
 
 ## 16. Twelve-Factor
 
-Cada novo servico deve atender:
-
-1. **Codebase:** modulo independente no mesmo repositorio do sistema.
-2. **Dependencies:** dependencias declaradas no Maven e versoes pelo BOM.
-3. **Config:** configuracao externa; segredos apenas em ambiente.
-4. **Backing services:** OpenAI, PostgreSQL, MCPs e observabilidade tratados como recursos anexados.
-5. **Build/release/run:** imagem imutavel e configuracao aplicada no release/run.
-6. **Processes:** processos stateless; memoria e vetores fora da JVM.
-7. **Port binding:** porta fornecida por `PORT`.
-8. **Concurrency:** escala por multiplas instancias.
-9. **Disposability:** startup rapido, shutdown gracioso e operacoes idempotentes.
-10. **Dev/prod parity:** mesma imagem e mesmos tipos de backing services.
-11. **Logs:** event stream em stdout/stderr.
-12. **Admin processes:** ingestao executada como processo one-off da mesma release.
+A implementacao detalhada, as evidencias e as excecoes deliberadas estao em
+`TWELVE_FACTOR.md`. Os servicos de negocio seguem os fatores sempre que o
+Docker Compose permite. O monorepo, o Config Server, os servicos de estado, a
+paridade com SaaS externos e a administracao nativa dos backing services sao
+classificados como conformidade parcial, com justificativa explicita.
 
 ## 17. Compose e infraestrutura
 
@@ -686,7 +679,7 @@ O Config Server deve armazenar politicas, nao segredos.
 - registro Eureka;
 - circuit breaker e timeout;
 - MCP cliente/servidor;
-- OpenAI substituida por servidor stub apenas nos testes automatizados.
+- Groq e Ollama substituidos por stubs apenas nos testes automatizados.
 
 ### Avaliacao da IA
 
@@ -741,7 +734,7 @@ Registrar:
 - threads;
 - bulkhead;
 - circuit breaker;
-- latencia e limites OpenAI.
+- latencia e limites Groq e latencia local do Ollama.
 
 Knee Capacity: ponto em que throughput deixa de crescer proporcionalmente ou latencia/erros aumentam fortemente.
 
@@ -773,7 +766,7 @@ Tavily nao deve participar do calculo principal do Knee Capacity, pois adiciona 
 - limitar iteracoes;
 - usar perguntas curtas;
 - acompanhar tokens no Grafana;
-- conhecer rate limits da conta OpenAI;
+- conhecer rate limits da conta Groq;
 - nao executar teste infinito;
 - nao usar cache que esconda a chamada real de IA no teste de capacidade.
 
@@ -782,13 +775,13 @@ Tavily nao deve participar do calculo principal do Knee Capacity, pois adiciona 
 ### Fase 0 - Decisoes e provas tecnicas
 
 - confirmar formato aceito para serverless;
-- criar conta/projeto e chaves OpenAI e Tavily;
+- criar conta/projeto e chaves Groq e Tavily;
 - validar Spring AI 2.0.0 no build atual;
-- testar uma chamada de chat OpenAI;
-- testar um embedding;
+- testar uma chamada de chat Groq;
+- testar um embedding local via Ollama;
 - testar PGVector;
 - listar tools do Tavily por Streamable HTTP;
-- validar tool calling com GPT-5.4 mini;
+- validar tool calling com Llama 4 Scout;
 - medir latencia inicial para definir deadlines.
 
 ### Fase 1 - Estrutura distribuida
@@ -818,7 +811,7 @@ Tavily nao deve participar do calculo principal do Knee Capacity, pois adiciona 
 - realizar similarity search;
 - retornar chunks e fontes antes de adicionar geracao.
 
-### Fase 4 - OpenAI e memoria
+### Fase 4 - Groq e memoria
 
 - configurar ChatClient;
 - criar prompt;
@@ -956,24 +949,23 @@ IMPLEMENTATION_PLAN.md
 ## 25. Riscos e decisoes pendentes
 
 1. **Serverless:** confirmar se container com Spring Cloud Function e aceito.
-2. **OpenAI:** verificar credito, rate limit e acesso ao modelo planejado.
+2. **Groq:** verificar rate limit gratuito e acesso ao modelo planejado.
 3. **Tavily:** verificar quota e compatibilidade do header de autenticacao no cliente MCP.
 4. **Timeout:** o Gateway atual usa 5 segundos, provavelmente insuficiente.
 5. **Memoria e tools:** validar a persistencia JDBC quando houver tool calls.
 6. **Corpus:** confirmar checksum e versao oficial antes da ingestao.
-7. **Custo JMeter:** limitar tokens e iteracoes.
+7. **Quota JMeter:** limitar tokens e iteracoes para permanecer no plano gratuito.
 8. **Spring AI:** manter a versao estavel 2.0.0, sem snapshots.
 
 ## 26. Referencias tecnicas
 
-- OpenAI Quickstart: <https://developers.openai.com/api/docs/quickstart>
-- OpenAI Models: <https://developers.openai.com/api/docs/models>
-- GPT-5.4 mini: <https://developers.openai.com/api/docs/models/gpt-5.4-mini>
-- OpenAI Embeddings: <https://developers.openai.com/api/docs/guides/embeddings>
-- OpenAI Rate Limits: <https://developers.openai.com/api/docs/guides/rate-limits>
+- Groq OpenAI Compatibility: <https://console.groq.com/docs/openai>
+- Groq Models: <https://console.groq.com/docs/models>
+- Groq Rate Limits: <https://console.groq.com/docs/rate-limits>
+- Ollama BGE-M3: <https://ollama.com/library/bge-m3>
 - Spring AI 2.0 Getting Started: <https://docs.spring.io/spring-ai/reference/getting-started.html>
 - Spring AI OpenAI Chat: <https://docs.spring.io/spring-ai/reference/api/chat/openai-chat.html>
-- Spring AI OpenAI Embeddings: <https://docs.spring.io/spring-ai/reference/api/embeddings/openai-embeddings.html>
+- Spring AI Ollama Embeddings: <https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html>
 - Spring AI PGVector: <https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html>
 - Spring AI Chat Memory: <https://docs.spring.io/spring-ai/reference/api/chat-memory.html>
 - Spring AI MCP: <https://docs.spring.io/spring-ai/reference/api/mcp/mcp-overview.html>

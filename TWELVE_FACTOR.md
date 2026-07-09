@@ -1,92 +1,30 @@
-# Twelve-Factor compliance
+# Twelve-factor assessment
 
-This repository applies the [Twelve-Factor App](https://12factor.net/)
-principles to the Config Server, Eureka registry, and API Gateway. Future
-business services must inherit the root Maven parent and follow the same
-runtime contract.
+This assessment applies to the Docker Compose deployment. It distinguishes the
+application processes from attached infrastructure because databases, model
+runtimes, discovery, and observability have different state and lifecycle
+requirements.
 
-## Build and release
+| Factor | Status | Implementation and evidence | Deliberate limitation |
+|---|---|---|---|
+| I. Codebase | Partial | One Git repository produces independently tagged service images from separate Maven modules. Modules do not share runtime state. | Strict one-codebase-per-service is not used. The monorepo keeps the academic system, configuration, and release revision atomic. |
+| II. Dependencies | Compliant | The Maven wrapper, parent BOMs, Enforcer rules, multi-stage Dockerfiles, explicit image versions, and available image digests declare runtime dependencies. | The Ollama model registry is tag-based, so `bge-m3:567m` must be revalidated when its local volume is recreated. Some third-party images use fixed versions when a verified index digest is unavailable. |
+| III. Config | Pragmatic | Secrets are required environment variables. Deploy-varying resource handles are environment-overridable. Config Server stores only non-secret policy outside application images. | Strict environment-only configuration is not used because Config Server and refresh behavior are intentional distributed-system features. `.env` is for local Compose only. |
+| IV. Backing services | Compliant | PostgreSQL, Ollama, Groq, Tavily, MCP, Eureka, Zipkin, Prometheus, and Config Git are attached through configurable resource handles or Compose DNS. Changing an attachment does not require rebuilding an application image. | Local Compose supplies concrete defaults, which a deployment must override when a resource moves. |
+| V. Build, release, run | Partial | Maven verification and `docker compose build` create tagged images with version/revision OCI labels. `docker compose up --no-build` runs the selected release. | Compose does not provide a release registry, promotion record, or immutable deployment controller; operators must preserve tags and revisions. |
+| VI. Processes | Application-compliant | Gateway, Question Service, RAG, Normalizer, MCP, Config Server, and Eureka containers do not store authoritative business state in their writable filesystems. Chat memory and vectors live in PostgreSQL; model files live in the Ollama volume. | PostgreSQL, Ollama, Config Git, Prometheus, and Grafana are intentionally stateful backing services. Eureka keeps an ephemeral replicated registry. |
+| VII. Port binding | Application-compliant | Every Java process binds the environment-provided `PORT` and exports HTTP directly. Only the edge and operational UIs are published to localhost. | Third-party images use their standard internal ports and are configured at the attachment boundary instead. |
+| VIII. Concurrency | Partial | Gateway, Question Service, RAG, Eureka, and HAProxy scale by adding processes. Business state is external, so replicas are interchangeable. | Local PostgreSQL and Ollama are single instances. Normalizer and MCP remain single replicas to fit local resource limits, although their processes are stateless. Rate limits are per RAG process, while Groq enforces the final organization-wide limit. |
+| IX. Disposability | Compliant | Spring uses graceful shutdown, Compose provides stop grace periods and health checks, restart attempts are bounded for application processes, and ingestion is checksum-idempotent. Request-path dependencies wait for usable upstream health. | Large Ollama model loading makes cold startup slower than the Java services. |
+| X. Dev/prod parity | Partial | The same application images, protocols, PGVector schema, and environment contract are used throughout the Compose workflow. | Tests use isolated doubles; local Config Git and Ollama cannot reproduce external infrastructure capacity, latency, or Groq quotas exactly. |
+| XI. Logs | Compliant | Spring and HAProxy write event streams to stdout/stderr with application, trace, and span correlation. Compose or the deployment platform owns collection and retention. | Local Compose does not provide durable centralized log storage. Prometheus and Zipkin cover metrics and traces, not log retention. |
+| XII. Admin processes | Mostly compliant | Corpus ingestion is an idempotent one-off execution of the same versioned RAG image and code used by the service. | Vector-table reset uses the PostgreSQL client image and model pull uses the Ollama image because these administer backing-service state; allowing the application process to destroy its own live schema would weaken isolation and safety. |
 
-The root Maven wrapper is the only supported build entry point. It pins Maven
-3.9.16, Java 26, Spring Boot 4.1.0, Spring Cloud 2025.1.2, build plugins, and
-dependency convergence rules.
+## Operational rules
 
-```powershell
-.\mvnw.cmd verify
-```
-
-Prepare deploy configuration without committing it:
-
-```powershell
-Copy-Item .env.example .env
-# Replace BUILD_REVISION and review every value in .env.
-```
-
-Build and run are separate stages. A release image is built once and is not
-rebuilt during startup:
-
-```powershell
-docker compose --env-file .env build
-docker compose --env-file .env up -d --no-build
-```
-
-`RELEASE_VERSION` is the immutable release identifier used in all application
-image tags. Change it for every release. Rollback means restoring the previous
-`.env` release/config label and running `up -d --no-build`; never overwrite a
-published release tag.
-
-## Environment contract
-
-Applications fail during bootstrap when required configuration is absent.
-Compose supplies each process's `PORT`; direct JVM launches must supply it
-themselves.
-
-Required attached-resource handles are:
-
-- `CONFIG_SERVER_URL` for Config clients.
-- `CONFIG_GIT_URI` and `CONFIG_GIT_DEFAULT_LABEL` for Config Server.
-- `EUREKA_PEERS` for registry replication and `EUREKA_URL` for clients.
-- `ZIPKIN_ENDPOINT` and `TRACING_SAMPLING_PROBABILITY` for Gateway tracing.
-
-`CONFIG_GIT_USERNAME` and `CONFIG_GIT_PASSWORD` are optional because public
-Git repositories do not require credentials. Never store real
-credentials in `.env.example`, Git, an image, or application properties.
-
-The local Compose stack runs Git as a separate, internal HTTP-backed service
-seeded from `config-repository/`. Deployed environments replace
-`CONFIG_GIT_URI` with their managed Git service without rebuilding Config
-Server.
-
-Config Server stores deploy-invariant application policy such as route,
-timeout, retry, and circuit-breaker behavior. Resource URLs, credentials,
-hostnames, release labels, and ports come from environment variables.
-
-## Compliance matrix
-
-| Factor | Implementation |
-| --- | --- |
-| I. Codebase | One Git repository and one release version for the current distributed system; each service remains independently buildable. |
-| II. Dependencies | Root Maven manifest, Boot/Cloud BOMs, Enforcer convergence, release-only dependencies, checked Maven wrapper, and container image pins. |
-| III. Config | Required orthogonal environment variables; `.env` is ignored and only a non-secret example is tracked. |
-| IV. Backing services | Config Git, Eureka, Zipkin, and other services are referenced through environment-provided URLs. |
-| V. Build/release/run | Maven/Docker build, versioned release image, and `up --no-build` runtime are distinct stages. |
-| VI. Processes | Gateway and registry processes are stateless; registry state is reconstructed from surviving peers. |
-| VII. Port binding | Every Spring process receives `PORT` and embeds its HTTP server. |
-| VIII. Concurrency | Gateway and Eureka scale through multiple independent containers rather than application-managed worker processes. |
-| IX. Disposability | Health checks, restart policies, graceful Spring shutdown, and bounded 25-second container termination. |
-| X. Dev/prod parity | The same JARs and container definitions are used locally and in deployment; only environment values change. |
-| XI. Logs | Applications and HAProxy write event streams to stdout/stderr; no application log files are used. |
-| XII. Admin processes | No migrations or administrative jobs exist yet. Future one-off jobs must run from the same versioned image and environment as the release. |
-
-## Service requirements
-
-A new service is compliant only when it:
-
-1. Is added as a module of the root Maven build and inherits its parent.
-2. Declares every direct dependency in its POM without dynamic or snapshot
-   versions; versions come from the central BOM or root dependency management.
-3. Reads deploy-specific resource handles and credentials from environment
-   variables without committed fallbacks.
-4. Stores no durable state in memory or its container filesystem.
-5. Logs to stdout/stderr, binds to `PORT`, supports graceful shutdown, and can
-   run more than one instance.
+- Build once and run with `--no-build`; never rebuild as part of release startup.
+- Keep `.env`, API keys, database passwords, and remote Git credentials out of Git, images, logs, and Config Server.
+- Change resource URLs through environment variables, not source edits or image rebuilds.
+- Scale only stateless application processes. Treat PostgreSQL and Ollama scaling as separate backing-service architecture work.
+- Run ingestion and vector reset explicitly through the `admin` Compose profile.
+- Revalidate this matrix when adding a service, persistent volume, local cache, background process, or new deployment target.

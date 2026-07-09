@@ -38,9 +38,9 @@
       "targets": [{"expr": "resilience4j_bulkhead_available_concurrent_calls", "legendFormat": "{{name}}"}]
     },
     {
-      "type": "timeseries", "title": "OpenAI token usage", "id": 7,
+      "type": "timeseries", "title": "Groq token usage", "id": 7,
       "gridPos": {"h": 6, "w": 6, "x": 18, "y": 8},
-      "targets": [{"expr": "sum by (type) (rate(rag_openai_tokens_total[5m]))", "legendFormat": "{{type}}"}]
+      "targets": [{"expr": "sum by (type) (rate(rag_groq_tokens_total[5m]))", "legendFormat": "{{type}}"}]
     },
     {
       "type": "timeseries", "title": "Grounding and tool calls", "id": 8,

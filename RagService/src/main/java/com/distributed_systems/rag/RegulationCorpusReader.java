@@ -2,6 +2,7 @@ package com.distributed_systems.rag;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -13,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,8 +71,9 @@ class RegulationCorpusReader {
 				metadata.put("checksum", corpus.metadata().sha256());
 				metadata.put("corpusVersion", corpus.metadata().version());
 				metadata.put("ingestedAt", Instant.now().toString());
+				String sourceId = corpus.metadata().sha256() + ":" + article.number() + ":" + index;
 				documents.add(Document.builder()
-						.id(corpus.metadata().sha256() + ":" + article.number() + ":" + index)
+						.id(UUID.nameUUIDFromBytes(sourceId.getBytes(StandardCharsets.UTF_8)).toString())
 						.text(chunks.get(index))
 						.metadata(metadata)
 						.build());

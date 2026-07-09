@@ -1,6 +1,7 @@
 name: distributed-systems
 
 x-eureka-environment: &eureka-environment
+  JAVA_TOOL_OPTIONS: "-Xms32m -Xmx192m"
   PORT: "8761"
   EUREKA_PEERS: ${EUREKA_PEERS:?Set EUREKA_PEERS in .env}
   CONFIG_SERVER_URL: ${CONFIG_SERVER_URL:?Set CONFIG_SERVER_URL in .env}
@@ -13,14 +14,15 @@ x-eureka-common: &eureka-common
     args:
       RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
       BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
-  restart: unless-stopped
+  restart: "on-failure:3"
+  mem_limit: 384m
   networks:
     - discovery
   depends_on:
     config-server:
       condition: service_healthy
   healthcheck:
-    test: ["CMD-SHELL", "wget -q -O - http://localhost:8761/actuator/health | grep -q '\"status\":\"UP\"'"]
+    test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8761/actuator/health | grep -q '\"status\":\"UP\"'"]
     interval: 10s
     timeout: 5s
     retries: 12
@@ -28,6 +30,7 @@ x-eureka-common: &eureka-common
   stop_grace_period: 25s
 
 x-gateway-environment: &gateway-environment
+  JAVA_TOOL_OPTIONS: "-Xms32m -Xmx192m"
   PORT: "8080"
   CONFIG_SERVER_URL: ${CONFIG_SERVER_URL:?Set CONFIG_SERVER_URL in .env}
   EUREKA_URL: ${EUREKA_URL:?Set EUREKA_URL in .env}
@@ -42,18 +45,19 @@ x-gateway-common: &gateway-common
     args:
       RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
       BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
-  restart: unless-stopped
+  restart: "on-failure:3"
+  mem_limit: 384m
   networks:
     - discovery
   depends_on:
     config-server:
       condition: service_healthy
     eureka-cluster:
-      condition: service_started
+      condition: service_healthy
     zipkin:
-      condition: service_started
+      condition: service_healthy
   healthcheck:
-    test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+    test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
     interval: 10s
     timeout: 5s
     retries: 12
@@ -61,6 +65,7 @@ x-gateway-common: &gateway-common
   stop_grace_period: 25s
 
 x-observed-service-environment: &observed-service-environment
+  JAVA_TOOL_OPTIONS: "-Xms32m -Xmx256m"
   CONFIG_SERVER_URL: ${CONFIG_SERVER_URL:?Set CONFIG_SERVER_URL in .env}
   EUREKA_URL: ${EUREKA_URL:?Set EUREKA_URL in .env}
   ZIPKIN_ENDPOINT: ${ZIPKIN_ENDPOINT:?Set ZIPKIN_ENDPOINT in .env}
@@ -74,20 +79,21 @@ x-question-service-common: &question-service-common
     args:
       RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
       BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
-  restart: unless-stopped
+  restart: "on-failure:3"
+  mem_limit: 512m
   networks:
     - discovery
   depends_on:
     config-server:
       condition: service_healthy
     eureka-cluster:
-      condition: service_started
+      condition: service_healthy
     rag-service-1:
-      condition: service_started
+      condition: service_healthy
     rag-service-2:
-      condition: service_started
+      condition: service_healthy
     question-normalizer:
-      condition: service_started
+      condition: service_healthy
   healthcheck:
     test: ["CMD-SHELL", "wget -q -O - http://localhost:8081/actuator/health | grep -q '\"status\":\"UP\"'"]
     interval: 10s
@@ -104,18 +110,21 @@ x-rag-service-common: &rag-service-common
     args:
       RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
       BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
-  restart: unless-stopped
+  restart: "on-failure:3"
+  mem_limit: 768m
   networks:
     - discovery
   depends_on:
     config-server:
       condition: service_healthy
     eureka-cluster:
-      condition: service_started
+      condition: service_healthy
     zipkin:
-      condition: service_started
+      condition: service_healthy
     postgres:
       condition: service_healthy
+    ollama-init:
+      condition: service_completed_successfully
     regulation-mcp:
       condition: service_healthy
   healthcheck:
@@ -128,8 +137,9 @@ x-rag-service-common: &rag-service-common
 
 services:
   postgres:
-    image: pgvector/pgvector:0.8.2-pg17-trixie
+    image: pgvector/pgvector:0.8.2-pg17-trixie@sha256:5c97c57367a485a8e99389548db67d441ab1a878f5492c3df04989f34ecf3c75
     restart: unless-stopped
+    mem_limit: 768m
     networks:
       - discovery
     environment:
@@ -144,6 +154,58 @@ services:
       timeout: 5s
       retries: 20
       start_period: 10s
+
+  ollama:
+    image: ollama/ollama:0.31.1
+    restart: unless-stopped
+    mem_limit: 2g
+    networks:
+      - discovery
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  ollama-init:
+    image: ollama/ollama:0.31.1
+    restart: "no"
+    mem_limit: 512m
+    networks:
+      - discovery
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    volumes:
+      - ollama-data:/root/.ollama
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["/bin/ollama"]
+    command: ["pull", "${OLLAMA_EMBEDDING_MODEL:-bge-m3:567m}"]
+
+  rag-vector-reset:
+    image: postgres:17.5-alpine
+    profiles: ["admin"]
+    restart: "no"
+    mem_limit: 128m
+    networks:
+      - discovery
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGDATABASE: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      PGUSER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        psql -v ON_ERROR_STOP=1 -c 'DROP TABLE IF EXISTS vector_store; DROP TABLE IF EXISTS corpus_ingestion;'
 
   config-git-init:
     image: alpine/git:2.54.0@sha256:e043be20669db13cbcfb6190192babee4cf2dca98709bb0c2d08ca2d35a0a06a
@@ -179,11 +241,13 @@ services:
       - ./config-repository:/seed:ro
       - config-git-data:/srv/git
     restart: "no"
+    mem_limit: 128m
 
   config-git:
     image: busybox:1.37.0@sha256:9532d8c39891ca2ecde4d30d7710e01fb739c87a8b9299685c63704296b16028
     command: ["httpd", "-f", "-p", "80", "-h", "/srv/git"]
     restart: unless-stopped
+    mem_limit: 64m
     networks:
       - discovery
     volumes:
@@ -207,12 +271,14 @@ services:
         RELEASE_VERSION: ${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
         BUILD_REVISION: ${BUILD_REVISION:?Set BUILD_REVISION in .env}
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms32m -Xmx192m"
       PORT: "8888"
       CONFIG_GIT_URI: ${CONFIG_GIT_URI:?Set CONFIG_GIT_URI in .env}
       CONFIG_GIT_DEFAULT_LABEL: ${CONFIG_GIT_DEFAULT_LABEL:?Set CONFIG_GIT_DEFAULT_LABEL in .env}
       SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME: ${CONFIG_GIT_USERNAME:-}
       SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD: ${CONFIG_GIT_PASSWORD:-}
-    restart: unless-stopped
+    restart: "on-failure:3"
+    mem_limit: 384m
     networks:
       - discovery
     depends_on:
@@ -258,24 +324,26 @@ services:
   eureka-cluster:
     image: haproxy:3.2.20-alpine@sha256:9f196dc9ec57310a1a430939221b33b36c14113497aca7ead9b13f4d5c2d37f5
     restart: unless-stopped
+    mem_limit: 128m
     networks:
       - discovery
     depends_on:
       eureka-1:
-        condition: service_started
+        condition: service_healthy
       eureka-2:
-        condition: service_started
+        condition: service_healthy
       eureka-3:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./infrastructure/haproxy/eureka.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     deploy:
       replicas: 2
     healthcheck:
-      test: ["CMD", "haproxy", "-c", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8761/actuator/health | grep -q '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
+      start_period: 10s
 
   gateway-1:
     <<: *gateway-common
@@ -296,30 +364,52 @@ services:
     hostname: rag-service-1
     environment:
       <<: *observed-service-environment
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx384m"
       PORT: "8082"
       EUREKA_INSTANCE_HOSTNAME: rag-service-1
       POSTGRES_URL: ${POSTGRES_URL:?Set POSTGRES_URL in .env}
       POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set OPENAI_API_KEY in .env}
+      SPRING_DATASOURCE_URL: ${POSTGRES_URL:?Set POSTGRES_URL in .env}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      GROQ_API_KEY: ${GROQ_API_KEY:?Set GROQ_API_KEY in .env}
+      GROQ_CHAT_MODEL: ${GROQ_CHAT_MODEL:-meta-llama/llama-4-scout-17b-16e-instruct}
+      GROQ_BASE_URL: ${GROQ_BASE_URL:-https://api.groq.com/openai/v1/}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-bge-m3:567m}
+      REGULATION_MCP_URL: ${REGULATION_MCP_URL:-http://regulation-mcp:8084}
+      APP_RAG_SIMILARITY_THRESHOLD: ${RAG_SIMILARITY_THRESHOLD:-0.45}
       TAVILY_API_KEY: ${TAVILY_API_KEY:?Set TAVILY_API_KEY in .env}
-      OPENAI_MAX_CONCURRENT_CALLS: ${OPENAI_MAX_CONCURRENT_CALLS:-10}
-      OPENAI_LIMIT_FOR_PERIOD: ${OPENAI_LIMIT_FOR_PERIOD:-20}
+      TAVILY_MCP_URL: ${TAVILY_MCP_URL:-https://mcp.tavily.com}
+      GROQ_MAX_CONCURRENT_CALLS: ${GROQ_MAX_CONCURRENT_CALLS:-3}
+      GROQ_LIMIT_FOR_PERIOD: ${GROQ_LIMIT_FOR_PERIOD:-3}
 
   rag-service-2:
     <<: *rag-service-common
     hostname: rag-service-2
     environment:
       <<: *observed-service-environment
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx384m"
       PORT: "8082"
       EUREKA_INSTANCE_HOSTNAME: rag-service-2
       POSTGRES_URL: ${POSTGRES_URL:?Set POSTGRES_URL in .env}
       POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set OPENAI_API_KEY in .env}
+      SPRING_DATASOURCE_URL: ${POSTGRES_URL:?Set POSTGRES_URL in .env}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      GROQ_API_KEY: ${GROQ_API_KEY:?Set GROQ_API_KEY in .env}
+      GROQ_CHAT_MODEL: ${GROQ_CHAT_MODEL:-meta-llama/llama-4-scout-17b-16e-instruct}
+      GROQ_BASE_URL: ${GROQ_BASE_URL:-https://api.groq.com/openai/v1/}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-bge-m3:567m}
+      REGULATION_MCP_URL: ${REGULATION_MCP_URL:-http://regulation-mcp:8084}
+      APP_RAG_SIMILARITY_THRESHOLD: ${RAG_SIMILARITY_THRESHOLD:-0.45}
       TAVILY_API_KEY: ${TAVILY_API_KEY:?Set TAVILY_API_KEY in .env}
-      OPENAI_MAX_CONCURRENT_CALLS: ${OPENAI_MAX_CONCURRENT_CALLS:-10}
-      OPENAI_LIMIT_FOR_PERIOD: ${OPENAI_LIMIT_FOR_PERIOD:-20}
+      TAVILY_MCP_URL: ${TAVILY_MCP_URL:-https://mcp.tavily.com}
+      GROQ_MAX_CONCURRENT_CALLS: ${GROQ_MAX_CONCURRENT_CALLS:-3}
+      GROQ_LIMIT_FOR_PERIOD: ${GROQ_LIMIT_FOR_PERIOD:-3}
 
   rag-ingestion:
     <<: *rag-service-common
@@ -328,17 +418,22 @@ services:
     restart: "no"
     environment:
       <<: *observed-service-environment
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx384m"
       PORT: "8082"
       EUREKA_INSTANCE_HOSTNAME: rag-ingestion
       POSTGRES_URL: ${POSTGRES_URL:?Set POSTGRES_URL in .env}
       POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set OPENAI_API_KEY in .env}
-      TAVILY_API_KEY: ${TAVILY_API_KEY:?Set TAVILY_API_KEY in .env}
+      SPRING_DATASOURCE_URL: ${POSTGRES_URL:?Set POSTGRES_URL in .env}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-bge-m3:567m}
       APP_INGESTION_ENABLED: "true"
       APP_INGESTION_EXIT_ON_COMPLETION: "true"
+      APP_RAG_AI_ENABLED: "false"
       SPRING_AI_MCP_CLIENT_ENABLED: "false"
-      SPRING_AI_OPENAI_CHAT_ENABLED: "false"
+      SPRING_AI_MODEL_CHAT: none
 
   question-normalizer:
     image: distributed-systems/question-normalizer:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
@@ -353,16 +448,17 @@ services:
       <<: *observed-service-environment
       PORT: "8083"
       EUREKA_INSTANCE_HOSTNAME: question-normalizer
-    restart: unless-stopped
+    restart: "on-failure:3"
+    mem_limit: 512m
     networks:
       - discovery
     depends_on:
       config-server:
         condition: service_healthy
       eureka-cluster:
-        condition: service_started
+        condition: service_healthy
       zipkin:
-        condition: service_started
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8083/actuator/health | grep -q '\"status\":\"UP\"'"]
       interval: 10s
@@ -384,16 +480,17 @@ services:
       <<: *observed-service-environment
       PORT: "8084"
       EUREKA_INSTANCE_HOSTNAME: regulation-mcp
-    restart: unless-stopped
+    restart: "on-failure:3"
+    mem_limit: 512m
     networks:
       - discovery
     depends_on:
       config-server:
         condition: service_healthy
       eureka-cluster:
-        condition: service_started
+        condition: service_healthy
       zipkin:
-        condition: service_started
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8084/actuator/health | grep -q '\"status\":\"UP\"'"]
       interval: 10s
@@ -409,6 +506,8 @@ services:
       <<: *observed-service-environment
       PORT: "8081"
       EUREKA_INSTANCE_HOSTNAME: question-service-1
+      NORMALIZER_URL: ${NORMALIZER_URL:-http://question-normalizer/normalizeQuestion}
+      RAG_GRAPHQL_URL: ${RAG_GRAPHQL_URL:-http://rag-service/graphql}
 
   question-service-2:
     <<: *question-service-common
@@ -417,49 +516,54 @@ services:
       <<: *observed-service-environment
       PORT: "8081"
       EUREKA_INSTANCE_HOSTNAME: question-service-2
+      NORMALIZER_URL: ${NORMALIZER_URL:-http://question-normalizer/normalizeQuestion}
+      RAG_GRAPHQL_URL: ${RAG_GRAPHQL_URL:-http://rag-service/graphql}
 
   gateway-edge:
     image: haproxy:3.2.20-alpine@sha256:9f196dc9ec57310a1a430939221b33b36c14113497aca7ead9b13f4d5c2d37f5
     restart: unless-stopped
+    mem_limit: 128m
     networks:
       - discovery
     depends_on:
       gateway-1:
-        condition: service_started
+        condition: service_healthy
       gateway-2:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./infrastructure/haproxy/gateway.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     ports:
       - "127.0.0.1:${GATEWAY_HOST_PORT:?Set GATEWAY_HOST_PORT in .env}:8080"
     healthcheck:
-      test: ["CMD", "haproxy", "-c", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
+      start_period: 10s
 
   prometheus:
     image: prom/prometheus:v3.12.0@sha256:69f5241418838263316593f7274a304b095c40bcf22e57272865da91bd60a8ac
     restart: unless-stopped
+    mem_limit: 512m
     networks:
       - discovery
     depends_on:
       gateway-1:
-        condition: service_started
+        condition: service_healthy
       gateway-2:
-        condition: service_started
+        condition: service_healthy
       question-service-1:
-        condition: service_started
+        condition: service_healthy
       question-service-2:
-        condition: service_started
+        condition: service_healthy
       rag-service-1:
-        condition: service_started
+        condition: service_healthy
       rag-service-2:
-        condition: service_started
+        condition: service_healthy
       question-normalizer:
-        condition: service_started
+        condition: service_healthy
       regulation-mcp:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
@@ -468,6 +572,7 @@ services:
   grafana:
     image: grafana/grafana:13.1.0
     restart: unless-stopped
+    mem_limit: 512m
     networks:
       - discovery
     depends_on:
@@ -486,7 +591,10 @@ services:
 
   zipkin:
     image: openzipkin/zipkin:3.6.1@sha256:d17e856dcbba7ffeefbbfc252f89ab78a4ab6faed47e646d46daad78f91b5ee2
+    environment:
+      JAVA_OPTS: "-Xms64m -Xmx256m"
     restart: unless-stopped
+    mem_limit: 512m
     networks:
       - discovery
     ports:
@@ -503,3 +611,5 @@ volumes:
     name: distributed-systems-postgres
   grafana-data:
     name: distributed-systems-grafana
+  ollama-data:
+    name: distributed-systems-ollama

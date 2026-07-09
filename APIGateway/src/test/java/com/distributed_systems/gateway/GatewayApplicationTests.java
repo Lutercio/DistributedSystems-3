@@ -103,7 +103,8 @@ class GatewayApplicationTests {
 		assertEquals("CircuitBreaker", route.getFilters().get(0).getName());
 		assertEquals("orders-service", route.getFilters().get(0).getArgs().get("name"));
 		assertEquals("Retry", route.getFilters().get(1).getName());
-		assertEquals("RewritePath", route.getFilters().get(2).getName());
+		assertEquals("StripPrefix", route.getFilters().get(2).getName());
+		assertEquals("1", route.getFilters().get(2).getArgs().get("parts"));
 
 		RouteDefinitionRouteLocator executableLocator = new RouteDefinitionRouteLocator(
 				() -> Flux.just(route),

@@ -34,12 +34,14 @@ class TavilyMcpToolCallbackProvider implements ToolCallbackProvider, AutoCloseab
 	private final WebClient.Builder webClientBuilder;
 	private final ObjectMapper objectMapper;
 	private final String apiKey;
+	private final String baseUrl;
 	private volatile McpSyncClient client;
 
 	TavilyMcpToolCallbackProvider(WebClient.Builder webClientBuilder, ObjectMapper objectMapper, Environment environment) {
 		this.webClientBuilder = webClientBuilder;
 		this.objectMapper = objectMapper;
 		this.apiKey = environment.getProperty("TAVILY_API_KEY", "");
+		this.baseUrl = environment.getProperty("TAVILY_MCP_URL", "https://mcp.tavily.com");
 	}
 
 	@Override
@@ -130,7 +132,7 @@ class TavilyMcpToolCallbackProvider implements ToolCallbackProvider, AutoCloseab
 				if (value == null) {
 					WebClientStreamableHttpTransport transport = WebClientStreamableHttpTransport
 							.builder(webClientBuilder.clone()
-									.baseUrl("https://mcp.tavily.com")
+									.baseUrl(baseUrl)
 									.defaultHeader("Authorization", "Bearer " + apiKey))
 							.endpoint("/mcp/")
 							.openConnectionOnStartup(false)

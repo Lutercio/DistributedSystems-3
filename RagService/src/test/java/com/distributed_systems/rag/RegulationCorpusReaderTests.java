@@ -1,9 +1,11 @@
 package com.distributed_systems.rag;
 
 import java.nio.file.Path;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,5 +26,8 @@ class RegulationCorpusReaderTests {
 		assertFalse(corpus.sections().isEmpty());
 		assertTrue(reader.documents().stream()
 				.anyMatch(document -> "1".equals(document.getMetadata().get("article"))));
+		assertTrue(reader.documents().stream()
+				.allMatch(document -> UUID.fromString(document.getId()).toString().equals(document.getId())));
+		assertEquals(reader.documents().getFirst().getId(), new RegulationCorpusReader(properties).documents().getFirst().getId());
 	}
 }
