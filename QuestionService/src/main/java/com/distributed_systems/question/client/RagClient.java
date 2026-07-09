@@ -3,6 +3,7 @@ package com.distributed_systems.question.client;
 import java.time.Duration;
 import java.util.Map;
 
+import org.springframework.graphql.ResponseError;
 import org.springframework.graphql.client.ClientGraphQlResponse;
 import org.springframework.graphql.client.HttpGraphQlClient;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,11 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class RagClient {
+
+	private static final String RATE_LIMIT_CODE = "RATE_LIMIT_EXCEEDED";
+	private static final String AI_PROVIDER_UNAVAILABLE_CODE = "AI_PROVIDER_UNAVAILABLE";
+	private static final String AI_PROVIDER_UNAVAILABLE_MESSAGE =
+			"AI provider is temporarily unavailable. Try again later.";
 
 	private static final String ASK_QUESTION_MUTATION = """
 			mutation AskQuestion($input: AskQuestionInput!) {
@@ -68,16 +74,27 @@ public class RagClient {
 				.document(ASK_QUESTION_MUTATION)
 				.variable("input", input)
 				.execute()
-				.timeout(timeout)
-				.doOnError(error -> meterRegistry.counter("question.downstream.failures", "service", "rag").increment())
-				.onErrorMap(error -> !(error instanceof DownstreamServiceException)
-						&& !(error instanceof RequestNotPermitted),
-						error -> new DownstreamServiceException("RagService is unavailable", error))
+					.timeout(timeout)
+					.doOnError(error -> meterRegistry.counter("question.downstream.failures", "service", "rag").increment())
+					.onErrorMap(error -> !(error instanceof DownstreamServiceException)
+							&& !(error instanceof DownstreamAiProviderUnavailableException)
+							&& !(error instanceof DownstreamRateLimitException)
+							&& !(error instanceof RequestNotPermitted),
+							error -> new DownstreamServiceException("RagService is unavailable", error))
 				.flatMap(this::decodeAnswer);
 	}
 
 	private Mono<RagAnswer> decodeAnswer(ClientGraphQlResponse response) {
-		if (!response.isValid() || !response.getErrors().isEmpty()) {
+		if (!response.getErrors().isEmpty()) {
+			if (hasRateLimitError(response)) {
+				return Mono.error(new DownstreamRateLimitException("Question capacity is temporarily exhausted"));
+			}
+			if (hasAiProviderUnavailableError(response)) {
+				return Mono.error(new DownstreamAiProviderUnavailableException(AI_PROVIDER_UNAVAILABLE_MESSAGE));
+			}
+			return Mono.error(new DownstreamServiceException("RagService returned GraphQL errors"));
+		}
+		if (!response.isValid()) {
 			return Mono.error(new DownstreamServiceException("RagService returned GraphQL errors"));
 		}
 		RagAnswer answer = response.field("askQuestion").toEntity(RagAnswer.class);
@@ -85,6 +102,23 @@ public class RagClient {
 			return Mono.error(new DownstreamServiceException("RagService returned no answer"));
 		}
 		return Mono.just(answer);
+	}
+
+	private boolean hasRateLimitError(ClientGraphQlResponse response) {
+		return hasErrorCode(response, RATE_LIMIT_CODE);
+	}
+
+	private boolean hasAiProviderUnavailableError(ClientGraphQlResponse response) {
+		return hasErrorCode(response, AI_PROVIDER_UNAVAILABLE_CODE);
+	}
+
+	private boolean hasErrorCode(ClientGraphQlResponse response, String code) {
+		return response.getErrors().stream().anyMatch(error -> hasErrorCode(error, code));
+	}
+
+	private boolean hasErrorCode(ResponseError error, String code) {
+		Map<String, Object> extensions = error.getExtensions();
+		return extensions != null && code.equals(extensions.get("code"));
 	}
 
 }

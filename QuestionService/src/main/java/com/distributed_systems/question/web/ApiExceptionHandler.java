@@ -12,6 +12,8 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 
 import com.distributed_systems.question.api.ApiErrorResponse;
+import com.distributed_systems.question.client.DownstreamAiProviderUnavailableException;
+import com.distributed_systems.question.client.DownstreamRateLimitException;
 import com.distributed_systems.question.client.DownstreamServiceException;
 import com.distributed_systems.question.service.InvalidQuestionException;
 
@@ -61,8 +63,34 @@ class ApiExceptionHandler {
 		);
 	}
 
+	@ExceptionHandler(DownstreamAiProviderUnavailableException.class)
+	ResponseEntity<ApiErrorResponse> handleAiProviderUnavailable(
+			DownstreamAiProviderUnavailableException exception,
+			ServerWebExchange exchange
+	) {
+		return response(
+				HttpStatus.SERVICE_UNAVAILABLE,
+				"AI_PROVIDER_UNAVAILABLE",
+				exception.getMessage(),
+				List.of(),
+				exchange
+		);
+	}
+
 	@ExceptionHandler(RequestNotPermitted.class)
 	ResponseEntity<ApiErrorResponse> handleRateLimit(RequestNotPermitted exception, ServerWebExchange exchange) {
+		return rateLimitResponse(exchange);
+	}
+
+	@ExceptionHandler(DownstreamRateLimitException.class)
+	ResponseEntity<ApiErrorResponse> handleDownstreamRateLimit(
+			DownstreamRateLimitException exception,
+			ServerWebExchange exchange
+	) {
+		return rateLimitResponse(exchange);
+	}
+
+	private ResponseEntity<ApiErrorResponse> rateLimitResponse(ServerWebExchange exchange) {
 		return response(
 				HttpStatus.TOO_MANY_REQUESTS,
 				"RATE_LIMIT_EXCEEDED",

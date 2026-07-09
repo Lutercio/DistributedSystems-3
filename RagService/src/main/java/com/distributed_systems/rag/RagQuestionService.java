@@ -6,6 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
@@ -16,7 +18,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.client.ResponseEntity;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.document.Document;
@@ -29,10 +30,19 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 @ConditionalOnProperty(name = "app.rag.ai-enabled", havingValue = "true", matchIfMissing = true)
 class RagQuestionService {
+
+	private static final Pattern EXACT_ARTICLE_PATTERN = Pattern.compile(
+			"\\b(?:artigo|art)\\.?\\s*(\\d{1,4})\\b",
+			Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+	);
+	private static final Set<String> REGULATION_TOOLS = Set.of(
+			"buscar_artigo", "listar_secoes", "obter_metadados_regulamento"
+	);
 
 	private static final String SYSTEM_PROMPT = """
 			Voce e o UFRN Responde. Responda somente em portugues e somente com base nos trechos
@@ -51,6 +61,7 @@ class RagQuestionService {
 	private final MeterRegistry meterRegistry;
 	private final CircuitBreakerRegistry circuitBreakerRegistry;
 	private final BulkheadRegistry bulkheadRegistry;
+	private final ObjectMapper objectMapper;
 
 	RagQuestionService(
 			ChatClient chatClient,
@@ -59,7 +70,8 @@ class RagQuestionService {
 			ObjectProvider<ToolCallbackProvider> toolProviders,
 			MeterRegistry meterRegistry,
 			CircuitBreakerRegistry circuitBreakerRegistry,
-			BulkheadRegistry bulkheadRegistry
+			BulkheadRegistry bulkheadRegistry,
+			ObjectMapper objectMapper
 	) {
 		this.chatClient = chatClient;
 		this.vectorStore = vectorStore;
@@ -68,6 +80,7 @@ class RagQuestionService {
 		this.meterRegistry = meterRegistry;
 		this.circuitBreakerRegistry = circuitBreakerRegistry;
 		this.bulkheadRegistry = bulkheadRegistry;
+		this.objectMapper = objectMapper;
 	}
 
 	@CircuitBreaker(name = "groq")
@@ -94,10 +107,15 @@ class RagQuestionService {
 			}
 
 			Set<String> toolsUsed = new LinkedHashSet<>();
-			List<ToolCallback> tools = availableTools(input.verifyOfficialSource(), toolsUsed);
+			String exactArticleEvidence = exactArticleEvidence(input.question(), regulationTools(toolsUsed));
+			List<ToolCallback> modelTools = availableTools(input.verifyOfficialSource(), toolsUsed);
 			String verificationInstruction = input.verifyOfficialSource()
 					? "Verifique se a URL oficial continua disponivel usando Tavily e limite a busca a ufrn.br."
 					: "Nao use ferramentas de busca na web nesta resposta.";
+			String context = context(documents);
+			if (!exactArticleEvidence.isBlank()) {
+				context = context + "\n\nEvidencia MCP propria:\n" + exactArticleEvidence;
+			}
 
 			ChatClient.ChatClientRequestSpec request = chatClient.prompt()
 					.system(SYSTEM_PROMPT)
@@ -108,17 +126,20 @@ class RagQuestionService {
 							%s
 
 							%s
-							""".formatted(input.question(), context(documents), verificationInstruction))
+
+							Responda em JSON com exatamente estes campos: "answer" como texto e
+							"grounded" como booleano. Nao inclua texto antes ou depois do JSON.
+							""".formatted(input.question(), context, verificationInstruction))
 					.advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, input.conversationId()));
-			if (!tools.isEmpty()) {
-				request = request.tools(tools.toArray());
+			if (!modelTools.isEmpty()) {
+				request = request.tools(modelTools.toArray());
 			}
-			ResponseEntity<ChatResponse, GeneratedAnswer> response = request.call().responseEntity(GeneratedAnswer.class);
-			GeneratedAnswer generated = response.entity();
+			ChatResponse response = request.call().chatResponse();
+			GeneratedAnswer generated = parseGeneratedAnswer(content(response));
 			if (generated == null || generated.answer() == null || generated.answer().isBlank()) {
-				throw new IllegalStateException("Groq returned no structured answer");
+				throw new IllegalStateException("Groq returned no answer");
 			}
-			recordUsage(response.response());
+			recordUsage(response);
 
 			boolean grounded = generated.grounded() == null || generated.grounded();
 			boolean verifiedOnline = toolsUsed.stream().anyMatch(this::isTavily);
@@ -146,8 +167,95 @@ class RagQuestionService {
 		meterRegistry.counter("rag.groq.tokens", "type", "output").increment(value(usage.getCompletionTokens()));
 	}
 
+	GeneratedAnswer parseGeneratedAnswer(String content) {
+		String trimmed = content == null ? "" : content.strip();
+		if (trimmed.isEmpty()) {
+			return new GeneratedAnswer("", false);
+		}
+
+		String json = firstJsonObject(trimmed);
+		if (json != null) {
+			try {
+				GeneratedAnswer generated = objectMapper.readValue(json, GeneratedAnswer.class);
+				if (generated.answer() != null && !generated.answer().isBlank()) {
+					return generated;
+				}
+			}
+			catch (Exception exception) {
+				meterRegistry.counter("rag.groq.output.parse.failures").increment();
+			}
+		}
+		return new GeneratedAnswer(trimmed, true);
+	}
+
+	private String content(ChatResponse response) {
+		if (response == null || response.getResult() == null || response.getResult().getOutput() == null) {
+			return "";
+		}
+		return response.getResult().getOutput().getText();
+	}
+
+	private String firstJsonObject(String content) {
+		int start = content.indexOf('{');
+		if (start < 0) {
+			return null;
+		}
+		boolean inString = false;
+		boolean escaping = false;
+		int depth = 0;
+		for (int index = start; index < content.length(); index++) {
+			char current = content.charAt(index);
+			if (escaping) {
+				escaping = false;
+				continue;
+			}
+			if (inString && current == '\\') {
+				escaping = true;
+				continue;
+			}
+			if (current == '"') {
+				inString = !inString;
+				continue;
+			}
+			if (inString) {
+				continue;
+			}
+			if (current == '{') {
+				depth++;
+			}
+			else if (current == '}') {
+				depth--;
+				if (depth == 0) {
+					return content.substring(start, index + 1);
+				}
+			}
+		}
+		return null;
+	}
+
 	private double value(Integer tokens) {
 		return tokens == null ? 0 : tokens;
+	}
+
+	private String exactArticleEvidence(String question, List<ToolCallback> tools) {
+		String article = exactArticleNumber(question);
+		if (article == null) {
+			return "";
+		}
+		return tools.stream()
+				.filter(tool -> "buscar_artigo".equals(tool.getToolDefinition().name()))
+				.findFirst()
+				.map(tool -> tool.call("{\"numero\":\"%s\"}".formatted(article)))
+				.map(response -> "buscar_artigo(%s): %s".formatted(article, response))
+				.orElse("");
+	}
+
+	private String exactArticleNumber(String question) {
+		Matcher matcher = EXACT_ARTICLE_PATTERN.matcher(question == null ? "" : question);
+		if (!matcher.find()) {
+			return null;
+		}
+		return matcher.group(1);
 	}
 
 	private List<ToolCallback> availableTools(boolean verifyOnline, Set<String> toolsUsed) {
@@ -166,8 +274,25 @@ class RagQuestionService {
 		return result;
 	}
 
+	private List<ToolCallback> regulationTools(Set<String> toolsUsed) {
+		List<ToolCallback> result = new ArrayList<>();
+		for (ToolCallbackProvider provider : toolProviders) {
+			for (ToolCallback callback : provider.getToolCallbacks()) {
+				String name = callback.getToolDefinition().name();
+				if (isRegulationTool(name)) {
+					result.add(new TrackingToolCallback(callback, toolsUsed));
+				}
+			}
+		}
+		return result;
+	}
+
 	private boolean isTavily(String name) {
 		return name.toLowerCase(Locale.ROOT).startsWith("tavily");
+	}
+
+	private boolean isRegulationTool(String name) {
+		return REGULATION_TOOLS.contains(name);
 	}
 
 	private String context(List<Document> documents) {

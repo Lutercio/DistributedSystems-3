@@ -34,6 +34,13 @@ All functional and load tests must use the Gateway URL. Run JMeter from the
 `jmeter/` directory so `questions.csv` resolves correctly. Override the URL
 with `-JbaseUrl=http://host:port` when necessary.
 
+`mcp-functional.jmx` keeps the internal MCP check running indefinitely at
+`-JmcpThroughputPerMinute=2` by default, below the default Groq limit of three
+requests per minute. Override only when the configured Groq quota is higher.
+Run `tavily-functional.jmx` separately when the third-party online-source check
+is required; it consumes Tavily and Groq quota and is not part of the internal
+MCP soak.
+
 ## Resilience demonstration
 
 Run `resilience.jmx`, stop one `rag-service` or `question-service` container,

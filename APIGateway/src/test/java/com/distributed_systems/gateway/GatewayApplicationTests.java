@@ -102,6 +102,7 @@ class GatewayApplicationTests {
 		assertTrue(route.getPredicates().get(0).getArgs().containsValue("/orders-service/**"));
 		assertEquals("CircuitBreaker", route.getFilters().get(0).getName());
 		assertEquals("orders-service", route.getFilters().get(0).getArgs().get("name"));
+		assertTrue(!route.getFilters().get(0).getArgs().containsKey("statusCodes"));
 		assertEquals("Retry", route.getFilters().get(1).getName());
 		assertEquals("StripPrefix", route.getFilters().get(2).getName());
 		assertEquals("1", route.getFilters().get(2).getArgs().get("parts"));

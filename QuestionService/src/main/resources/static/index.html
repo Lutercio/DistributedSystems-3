@@ -246,9 +246,9 @@
 					})
 				});
 
-				const body = await response.json();
+				const body = await readJson(response);
 				if (!response.ok) {
-					throw new Error(body.message || 'Não foi possível obter a resposta.');
+					throw new Error(errorMessage(body, response));
 				}
 
 				conversationId = body.conversationId || conversationId;
@@ -262,6 +262,26 @@
 				scrollToBottom();
 			}
 		});
+
+		async function readJson(response) {
+			const text = await response.text();
+			if (!text) return {};
+			try {
+				return JSON.parse(text);
+			} catch (error) {
+				return { message: text };
+			}
+		}
+
+		function errorMessage(body, response) {
+			const message = body?.message || 'Não foi possível obter a resposta.';
+			const details = [];
+			if (body?.code) details.push(body.code);
+			if (body?.correlationId) details.push(`correlation ${body.correlationId}`);
+			if (body?.requestId) details.push(`request ${body.requestId}`);
+			if (!details.length && response?.status) details.push(`HTTP ${response.status}`);
+			return details.length ? `${message} (${details.join(', ')})` : message;
+		}
 
 		questionInput.addEventListener('keydown', (event) => {
 			if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {

@@ -9,6 +9,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.distributed_systems.question.api.QuestionRequest;
 import com.distributed_systems.question.api.QuestionResponse;
+import com.distributed_systems.question.client.DownstreamAiProviderUnavailableException;
+import com.distributed_systems.question.client.DownstreamRateLimitException;
 import com.distributed_systems.question.client.DownstreamServiceException;
 import com.distributed_systems.question.service.QuestionCoordinator;
 
@@ -77,6 +79,37 @@ class QuestionControllerTests {
 				.expectStatus().isEqualTo(503)
 				.expectBody()
 				.jsonPath("$.code").isEqualTo("RAG_SERVICE_UNAVAILABLE");
+	}
+
+	@Test
+	void mapsAiProviderUnavailableToServiceUnavailable() {
+		when(coordinator.ask(any(QuestionRequest.class), anyString()))
+				.thenReturn(Mono.error(new DownstreamAiProviderUnavailableException(
+						"AI provider is temporarily unavailable. Try again later."
+				)));
+
+		webTestClient.post().uri("/api/questions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue("{\"question\":\"Como funciona?\"}")
+				.exchange()
+				.expectStatus().isEqualTo(503)
+				.expectBody()
+				.jsonPath("$.code").isEqualTo("AI_PROVIDER_UNAVAILABLE")
+				.jsonPath("$.message").isEqualTo("AI provider is temporarily unavailable. Try again later.");
+	}
+
+	@Test
+	void mapsDownstreamRateLimitToTooManyRequests() {
+		when(coordinator.ask(any(QuestionRequest.class), anyString()))
+				.thenReturn(Mono.error(new DownstreamRateLimitException("Question capacity is temporarily exhausted")));
+
+		webTestClient.post().uri("/api/questions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue("{\"question\":\"Como funciona?\"}")
+				.exchange()
+				.expectStatus().isEqualTo(429)
+				.expectBody()
+				.jsonPath("$.code").isEqualTo("RATE_LIMIT_EXCEEDED");
 	}
 
 }
