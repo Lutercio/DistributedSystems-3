@@ -1,6 +1,7 @@
 package com.distributed_systems.gateway;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -41,6 +42,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 		"EUREKA_URL=http://localhost:8761/eureka/",
 		"ZIPKIN_ENDPOINT=http://localhost:9411/api/v2/spans",
 		"TRACING_SAMPLING_PROBABILITY=1.0",
+		"app.gateway.circuit-breaker-recovery.enabled=true",
+		"app.gateway.circuit-breaker-recovery.interval=1h",
+		"app.gateway.circuit-breaker-recovery.timeout=1s",
 		"spring.cloud.config.enabled=false",
 		"eureka.client.enabled=false"
 })
@@ -71,6 +75,12 @@ class GatewayApplicationTests {
 	@Autowired
 	private ConfigurationService configurationService;
 
+	@Autowired
+	private CircuitBreakerRecoveryProber circuitBreakerRecoveryProber;
+
+	@Autowired
+	private CircuitBreakerRecoveryProperties circuitBreakerRecoveryProperties;
+
 	@Test
 	void configuresConfigClientAndLoadBalancer() throws IOException {
 		Properties applicationProperties = PropertiesLoaderUtils.loadProperties(
@@ -83,6 +93,9 @@ class GatewayApplicationTests {
 		assertEquals(2000, environment.getProperty("spring.cloud.config.request-connect-timeout", Integer.class));
 		assertNotNull(loadBalancerClientFactory);
 		assertNotNull(circuitBreakerFactory);
+		assertNotNull(circuitBreakerRecoveryProber);
+		assertEquals(Duration.ofHours(1), circuitBreakerRecoveryProperties.interval());
+		assertEquals(Duration.ofSeconds(1), circuitBreakerRecoveryProperties.timeout());
 		assertTrue(discoveryProperties.isEnabled());
 		assertEquals("metadata['gateway-exposed'] == 'true'", discoveryProperties.getIncludeExpression());
 	}

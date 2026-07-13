@@ -220,6 +220,7 @@
 		const questionInput = document.querySelector('#question');
 		const submit = document.querySelector('#submit');
 		const verifyInput = document.querySelector('#verify');
+		const questionsEndpoint = resolveQuestionsEndpoint(window.location.pathname);
 
 		let conversationId = '';
 
@@ -236,7 +237,7 @@
 			const loadingMessage = appendTextMessage('assistant loading', 'Consultando...');
 
 			try {
-				const response = await fetch('./api/questions', {
+				const response = await fetch(questionsEndpoint, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
@@ -262,6 +263,13 @@
 				scrollToBottom();
 			}
 		});
+
+		function resolveQuestionsEndpoint(pathname) {
+			const basePath = pathname
+					.replace(/\/index\.html$/, '')
+					.replace(/\/$/, '');
+			return `${basePath}/api/questions`;
+		}
 
 		async function readJson(response) {
 			const text = await response.text();

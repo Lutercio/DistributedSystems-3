@@ -7,16 +7,16 @@
     <list default="true" id="3bc8c164-6799-4bd6-a44d-6e47a28bc66b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IMPLEMENTATION_PLAN.md" beforeDir="false" afterPath="$PROJECT_DIR$/IMPLEMENTATION_PLAN.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RUNBOOK.md" beforeDir="false" afterPath="$PROJECT_DIR$/RUNBOOK.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RagService/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RagService/src/main/java/com/distributed_systems/rag/RagQuestionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/src/main/java/com/distributed_systems/rag/RagQuestionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RagService/src/test/java/com/distributed_systems/rag/RagServiceApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/src/test/java/com/distributed_systems/rag/RagServiceApplicationTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RagService/src/test/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/RagService/src/test/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/GATEWAY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/src/main/java/com/distributed_systems/gateway/GatewayApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/src/main/java/com/distributed_systems/gateway/GatewayApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGateway/src/test/java/com/distributed_systems/gateway/GatewayApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/APIGateway/src/test/java/com/distributed_systems/gateway/GatewayApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConfigServer/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ConfigServer/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestionService/src/main/java/com/distributed_systems/question/QuestionServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/QuestionService/src/main/java/com/distributed_systems/question/QuestionServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuestionService/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/QuestionService/src/main/resources/static/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config-repository/config/rag-service/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config-repository/config/rag-service/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/grafana/dashboards/ufrn-responde.json" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/grafana/dashboards/ufrn-responde.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jmeter/capacity.jmx" beforeDir="false" afterPath="$PROJECT_DIR$/jmeter/capacity.jmx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config-repository/config/question-service/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config-repository/config/question-service/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jmeter/mcp-functional.jmx" beforeDir="false" afterPath="$PROJECT_DIR$/jmeter/mcp-functional.jmx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/knowledge-base/README.md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,10 +113,29 @@
       <workItem from="1783367074291" duration="3161000" />
       <workItem from="1783388494264" duration="203000" />
       <workItem from="1783476577248" duration="50000" />
+      <workItem from="1783552608572" duration="1264000" />
+      <workItem from="1783909828168" duration="6183000" />
+      <workItem from="1783948679688" duration="2427000" />
+      <workItem from="1783953179827" duration="6730000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-core" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.graphql:spring-graphql" />
+    <option featureType="dependencySupport" implementationName="java:jakarta.validation:jakarta.validation-api" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.boot:spring-boot-starter-graphql" />
+    <option featureType="dependencySupport" implementationName="java:io.projectreactor:reactor-core" />
+    <option featureType="dependencySupport" implementationName="executable:kubectl" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.cloud:spring-cloud-context" />
+    <option featureType="dependencySupport" implementationName="java:org.hibernate.validator:hibernate-validator" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-webmvc" />
+    <option featureType="dependencySupport" implementationName="executable:docker" />
+    <option featureType="dependencySupport" implementationName="java:jakarta.ws.rs:jakarta.ws.rs-api" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-messaging" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.boot:spring-boot" />
   </component>
 </project>

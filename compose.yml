@@ -36,6 +36,7 @@ x-gateway-environment: &gateway-environment
   EUREKA_URL: ${EUREKA_URL:?Set EUREKA_URL in .env}
   ZIPKIN_ENDPOINT: ${ZIPKIN_ENDPOINT:?Set ZIPKIN_ENDPOINT in .env}
   TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY:?Set TRACING_SAMPLING_PROBABILITY in .env}
+  APP_GATEWAY_CIRCUIT_BREAKER_RECOVERY_ENABLED: ${GATEWAY_CIRCUIT_BREAKER_RECOVERY_ENABLED:-true}
 
 x-gateway-common: &gateway-common
   image: distributed-systems/gateway:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
@@ -508,6 +509,7 @@ services:
       EUREKA_INSTANCE_HOSTNAME: question-service-1
       NORMALIZER_URL: ${NORMALIZER_URL:-http://question-normalizer/normalizeQuestion}
       RAG_GRAPHQL_URL: ${RAG_GRAPHQL_URL:-http://rag-service/graphql}
+      APP_QUESTION_SERVICE_CIRCUIT_BREAKER_RECOVERY_ENABLED: ${QUESTION_SERVICE_CIRCUIT_BREAKER_RECOVERY_ENABLED:-true}
 
   question-service-2:
     <<: *question-service-common
@@ -518,6 +520,7 @@ services:
       EUREKA_INSTANCE_HOSTNAME: question-service-2
       NORMALIZER_URL: ${NORMALIZER_URL:-http://question-normalizer/normalizeQuestion}
       RAG_GRAPHQL_URL: ${RAG_GRAPHQL_URL:-http://rag-service/graphql}
+      APP_QUESTION_SERVICE_CIRCUIT_BREAKER_RECOVERY_ENABLED: ${QUESTION_SERVICE_CIRCUIT_BREAKER_RECOVERY_ENABLED:-true}
 
   gateway-edge:
     image: haproxy:3.2.20-alpine@sha256:9f196dc9ec57310a1a430939221b33b36c14113497aca7ead9b13f4d5c2d37f5

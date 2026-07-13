@@ -1,0 +1,261 @@
+{"kind":"deck","id":"pr/byps05","name":"Deck"}
+{"kind":"layout","layoutId":"cf4b7828-e042-4670-8911-ecc5780cb169","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"526d259d-71b5-4199-840d-23f493853dda","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/kccimn","slide":1,"title":"UFRN Responde","textShapes":8}
+{"kind":"shape","id":"sh/p0bi9s36","slide":1,"name":"cover-band","bbox":[0,388,1280,332]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":1,"name":"cover-kicker","text":"UFRN Responde","textPreview":"UFRN Responde","textChars":13,"textLines":1,"bbox":[42,42,520,34]}
+{"kind":"textbox","id":"sh/bulwval8","slide":1,"name":"cover-title","text":"12 Factors App no projeto","textPreview":"12 Factors App no projeto","textChars":25,"textLines":1,"bbox":[41,118,905,160]}
+{"kind":"textbox","id":"sh/032lszqt","slide":1,"name":"cover-subtitle","text":"Avaliação de aderência dos serviços Spring Boot, Docker Compose e configuração centralizada.","textPreview":"Avaliação de aderência dos serviços Spring Boot, Docker Compose e configuração centralizada.","textChars":92,"textLines":1,"bbox":[45,292,760,54]}
+{"kind":"shape","id":"sh/tovahoza","slide":1,"name":"cover-square-1","bbox":[452,457,27,27]}
+{"kind":"shape","id":"sh/ixczed8v","slide":1,"name":"cover-square-2","bbox":[864,457,27,27]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":1,"name":"cover-evidence-title","text":"Base de evidência","textPreview":"Base de evidência","textChars":17,"textLines":1,"bbox":[452,514,320,28]}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":1,"name":"cover-evidence-body","text":"TWELVE_FACTOR.md, Compose, Config Server, Dockerfiles e propriedades dos módulos.","textPreview":"TWELVE_FACTOR.md, Compose, Config Server, Dockerfiles e propriedades dos módulos.","textChars":81,"textLines":1,"bbox":[452,552,310,62]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":1,"name":"cover-takeaway-title","text":"Leitura principal","textPreview":"Leitura principal","textChars":17,"textLines":1,"bbox":[864,514,320,28]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":1,"name":"cover-takeaway-body","text":"As aplicações são bem aderentes; as exceções estão concentradas em release, monorepo e infraestrutura local.","textPreview":"As aplicações são bem aderentes; as exceções estão concentradas em release, monorepo e infraestrutura local.","textChars":108,"textLines":1,"bbox":[864,552,330,62]}
+{"kind":"textbox","id":"sh/obm58z25","slide":1,"name":"slide-number","text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[1184,659,54,25]}
+{"kind":"notes","id":"nt/kccimn","slide":1,"text":""}
+{"kind":"slide","id":"sl/u4d5n9","slide":2,"title":"A avaliação separa aplicação stateless de infraestrutura stateful","textShapes":11}
+{"kind":"textbox","id":"sh/36hcrmhk","slide":2,"name":"title","text":"A avaliação separa aplicação stateless de infraestrutura stateful","textPreview":"A avaliação separa aplicação stateless de infraestrutura stateful","textChars":65,"textLines":1,"bbox":[41,36,1198,78]}
+{"kind":"textbox","id":"sh/wra5gbq1","slide":2,"name":"subtitle","text":"O projeto é um sistema distribuído em Compose; por isso, a leitura dos fatores considera os processos de aplicação como unidade principal.","textPreview":"O projeto é um sistema distribuído em Compose; por isso, a leitura dos fatores considera os processos de aplicação como unidade principal.","textChars":138,"textLines":1,"bbox":[42,118,950,54]}
+{"kind":"shape","id":"sh/lc7u54zi","slide":2,"name":"lane-1","bbox":[42,226,360,315]}
+{"kind":"shape","id":"sh/ed8bat47","slide":2,"name":"lane-2","bbox":[460,226,360,315]}
+{"kind":"shape","id":"sh/7u54zido","slide":2,"name":"lane-3","bbox":[878,226,360,315]}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":2,"name":"lane-1-title","text":"Entrada e descoberta","textPreview":"Entrada e descoberta","textChars":20,"textLines":1,"bbox":[72,258,300,34]}
+{"kind":"textbox","id":"sh/l0rqd4vm","slide":2,"name":"lane-1-body","text":"HAProxy publica o gateway localmente.\nEureka mantém descoberta replicada.\nConfig Server entrega política de runtime.","textPreview":"HAProxy publica o gateway localmente. | Eureka mantém descoberta replicada. | Config Server entrega política de runtime.","textChars":116,"textLines":3,"bbox":[72,313,290,150]}
+{"kind":"textbox","id":"sh/e1w7mp0b","slide":2,"name":"lane-2-title","text":"Serviços de aplicação","textPreview":"Serviços de aplicação","textChars":21,"textLines":1,"bbox":[490,258,300,34]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":2,"name":"lane-2-body","text":"Gateway, Question Service, RAG, Normalizer e Regulation MCP rodam como processos substituíveis.\nO estado de negócio fica fora dos containers.","textPreview":"Gateway, Question Service, RAG, Normalizer e Regulation MCP rodam como processos substituíveis. | O estado de negócio fica fora dos conta...","textChars":141,"textLines":2,"bbox":[490,313,290,150]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":2,"name":"lane-3-title","text":"Backing services","textPreview":"Backing services","textChars":16,"textLines":1,"bbox":[908,258,300,34]}
+{"kind":"textbox","id":"sh/6xkf6dcb","slide":2,"name":"lane-3-body","text":"PostgreSQL/PGVector, Ollama, Groq, Tavily, Zipkin, Prometheus, Grafana e Config Git entram por URLs, credenciais ou DNS Compose.","textPreview":"PostgreSQL/PGVector, Ollama, Groq, Tavily, Zipkin, Prometheus, Grafana e Config Git entram por URLs, credenciais ou DNS Compose.","textChars":128,"textLines":1,"bbox":[908,313,290,165]}
+{"kind":"shape","id":"sh/hk3q5o7q","slide":2,"name":"context-rule","bbox":[42,582,820,2]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":2,"name":"context-takeaway","text":"Conclusão: os fatores são fortes no desenho dos processos Java; as limitações aparecem quando Compose substitui uma plataforma de release e quando serviços de dados são locais.","textPreview":"Conclusão: os fatores são fortes no desenho dos processos Java; as limitações aparecem quando Compose substitui uma plataforma de release...","textChars":176,"textLines":1,"bbox":[42,604,900,36]}
+{"kind":"textbox","id":"sh/zqtcj6to","slide":2,"name":"source","text":"Fonte: compose.yml; config-repository/config/*; TWELVE_FACTOR.md","textPreview":"Fonte: compose.yml; config-repository/config/*; TWELVE_FACTOR.md","textChars":64,"textLines":1,"bbox":[41,662,880,25]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":2,"name":"slide-number","text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[1184,659,54,25]}
+{"kind":"notes","id":"nt/u4d5n9","slide":2,"text":""}
+{"kind":"slide","id":"sl/migdy8","slide":3,"title":"O placar é bom, mas não é purista","textShapes":49}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":3,"name":"title","text":"O placar é bom, mas não é purista","textPreview":"O placar é bom, mas não é purista","textChars":33,"textLines":1,"bbox":[41,36,1198,78]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":3,"name":"subtitle","text":"A arquitetura usa bem processos descartáveis, portas, logs e backing services; a aderência cai onde há monorepo, Config Server e Compose como mecanismo de release.","textPreview":"A arquitetura usa bem processos descartáveis, portas, logs e backing services; a aderência cai onde há monorepo, Config Server e Compose ...","textChars":163,"textLines":1,"bbox":[42,118,950,54]}
+{"kind":"shape","id":"sh/8bat47y1","slide":3,"name":"metric-1-tile","bbox":[42,222,245,150]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":3,"name":"metric-1-stat","text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[68,250,185,64]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":3,"name":"metric-1-label","text":"aderentes ou aderentes nas aplicações","textPreview":"aderentes ou aderentes nas aplicações","textChars":37,"textLines":1,"bbox":[68,320,190,38]}
+{"kind":"shape","id":"sh/18jqh0fe","slide":3,"name":"metric-2-tile","bbox":[318,222,245,150]}
+{"kind":"textbox","id":"sh/8nqxs72x","slide":3,"name":"metric-2-stat","text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[344,250,185,64]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":3,"name":"metric-2-label","text":"parciais ou pragmáticos","textPreview":"parciais ou pragmáticos","textChars":23,"textLines":1,"bbox":[344,320,190,38]}
+{"kind":"shape","id":"sh/ulwval87","slide":3,"name":"metric-3-tile","bbox":[42,404,245,150]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":3,"name":"metric-3-stat","text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[68,432,185,64]}
+{"kind":"textbox","id":"sh/tgfmlkjm","slide":3,"name":"metric-3-label","text":"quase aderente","textPreview":"quase aderente","textChars":14,"textLines":1,"bbox":[68,502,190,38]}
+{"kind":"shape","id":"sh/mp0bi9s3","slide":3,"name":"metric-4-tile","bbox":[318,404,245,150]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":3,"name":"metric-4-stat","text":"0","textPreview":"0","textChars":1,"textLines":1,"bbox":[344,432,185,64]}
+{"kind":"textbox","id":"sh/47y1kre1","slide":3,"name":"metric-4-label","text":"bloqueios críticos para operar localmente","textPreview":"bloqueios críticos para operar localmente","textChars":41,"textLines":1,"bbox":[344,502,190,38]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":3,"name":"score-rail-title","text":"Status fator a fator","textPreview":"Status fator a fator","textChars":20,"textLines":1,"bbox":[690,136,500,28]}
+{"kind":"shape","id":"sh/m1cfa9w3","slide":3,"name":"status-line-0","bbox":[690,207,500,1]}
+{"kind":"shape","id":"sh/bm58z25k","slide":3,"name":"status-dot-0","bbox":[690,185,14,14]}
+{"kind":"textbox","id":"sh/4byhgn29","slide":3,"name":"status-roman-0","text":"I","textPreview":"I","textChars":1,"textLines":1,"bbox":[714,178,42,26]}
+{"kind":"textbox","id":"sh/twra5gbq","slide":3,"name":"status-factor-0","text":"Codebase","textPreview":"Codebase","textChars":8,"textLines":1,"bbox":[760,178,220,26]}
+{"kind":"textbox","id":"sh/1gvy90je","slide":3,"name":"status-label-0","text":"Parcial","textPreview":"Parcial","textChars":7,"textLines":1,"bbox":[1010,178,180,26]}
+{"kind":"shape","id":"sh/8z25kb6x","slide":3,"name":"status-line-1","bbox":[690,243,500,1]}
+{"kind":"shape","id":"sh/je9cvixc","slide":3,"name":"status-dot-1","bbox":[690,221,14,14]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":3,"name":"status-roman-1","text":"II","textPreview":"II","textChars":2,"textLines":1,"bbox":[714,214,42,26]}
+{"kind":"textbox","id":"sh/xs72x4na","slide":3,"name":"status-factor-1","text":"Dependencies","textPreview":"Dependencies","textChars":12,"textLines":1,"bbox":[760,214,220,26]}
+{"kind":"textbox","id":"sh/87ed8bat","slide":3,"name":"status-label-1","text":"Aderente","textPreview":"Aderente","textChars":8,"textLines":1,"bbox":[1010,214,180,26]}
+{"kind":"shape","id":"sh/fmlkjm1c","slide":3,"name":"status-line-2","bbox":[690,279,500,1]}
+{"kind":"shape","id":"sh/q1orytsv","slide":3,"name":"status-dot-2","bbox":[690,257,14,14]}
+{"kind":"textbox","id":"sh/x4nap4r6","slide":3,"name":"status-roman-2","text":"III","textPreview":"III","textChars":3,"textLines":1,"bbox":[714,250,42,26]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":3,"name":"status-factor-2","text":"Config","textPreview":"Config","textChars":6,"textLines":1,"bbox":[760,250,220,26]}
+{"kind":"textbox","id":"sh/2t83itgf","slide":3,"name":"status-label-2","text":"Pragmático","textPreview":"Pragmático","textChars":10,"textLines":1,"bbox":[1010,250,180,26]}
+{"kind":"shape","id":"sh/re1w7mp0","slide":3,"name":"status-line-3","bbox":[690,315,500,1]}
+{"kind":"shape","id":"sh/kzupwb2h","slide":3,"name":"status-dot-3","bbox":[690,293,14,14]}
+{"kind":"textbox","id":"sh/9knih4by","slide":3,"name":"status-roman-3","text":"IV","textPreview":"IV","textChars":2,"textLines":1,"bbox":[714,286,42,26]}
+{"kind":"textbox","id":"sh/25kb6xkf","slide":3,"name":"status-factor-3","text":"Backing services","textPreview":"Backing services","textChars":16,"textLines":1,"bbox":[760,286,220,26]}
+{"kind":"textbox","id":"sh/rqd4vmtw","slide":3,"name":"status-label-3","text":"Aderente","textPreview":"Aderente","textChars":8,"textLines":1,"bbox":[1010,286,180,26]}
+{"kind":"shape","id":"sh/kb6xkf6d","slide":3,"name":"status-line-4","bbox":[690,351,500,1]}
+{"kind":"shape","id":"sh/9w3m94fu","slide":3,"name":"status-dot-4","bbox":[690,329,14,14]}
+{"kind":"textbox","id":"sh/2hwfyxob","slide":3,"name":"status-roman-4","text":"V","textPreview":"V","textChars":1,"textLines":1,"bbox":[714,322,42,26]}
+{"kind":"textbox","id":"sh/r2p8nqxs","slide":3,"name":"status-factor-4","text":"Build, release, run","textPreview":"Build, release, run","textChars":19,"textLines":1,"bbox":[760,322,220,26]}
+{"kind":"textbox","id":"sh/vu9knih4","slide":3,"name":"status-label-4","text":"Parcial","textPreview":"Parcial","textChars":7,"textLines":1,"bbox":[1010,322,180,26]}
+{"kind":"shape","id":"sh/29gr2p8n","slide":3,"name":"status-line-5","bbox":[690,387,500,1]}
+{"kind":"shape","id":"sh/d0z61032","slide":3,"name":"status-dot-5","bbox":[690,365,14,14]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":3,"name":"status-roman-5","text":"VI","textPreview":"VI","textChars":2,"textLines":1,"bbox":[714,358,42,26]}
+{"kind":"textbox","id":"sh/v6psfil0","slide":3,"name":"status-factor-5","text":"Processes","textPreview":"Processes","textChars":9,"textLines":1,"bbox":[760,358,220,26]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":3,"name":"status-label-5","text":"Aderente nas apps","textPreview":"Aderente nas apps","textChars":17,"textLines":1,"bbox":[1010,358,180,26]}
+{"kind":"shape","id":"sh/d8bat47y","slide":3,"name":"status-line-6","bbox":[690,423,500,1]}
+{"kind":"shape","id":"sh/knih4byh","slide":3,"name":"status-dot-6","bbox":[690,401,14,14]}
+{"kind":"textbox","id":"sh/val87ed8","slide":3,"name":"status-roman-6","text":"VII","textPreview":"VII","textChars":3,"textLines":1,"bbox":[714,394,42,26]}
+{"kind":"textbox","id":"sh/6psfil0r","slide":3,"name":"status-factor-6","text":"Port binding","textPreview":"Port binding","textChars":12,"textLines":1,"bbox":[760,394,220,26]}
+{"kind":"textbox","id":"sh/gn29gr2p","slide":3,"name":"status-label-6","text":"Aderente nas apps","textPreview":"Aderente nas apps","textChars":17,"textLines":1,"bbox":[1010,394,180,26]}
+{"kind":"shape","id":"sh/58z25kb6","slide":3,"name":"status-line-7","bbox":[690,459,500,1]}
+{"kind":"shape","id":"sh/yhgn29gr","slide":3,"name":"status-dot-7","bbox":[690,437,14,14]}
+{"kind":"textbox","id":"sh/n29gr2p8","slide":3,"name":"status-roman-7","text":"VIII","textPreview":"VIII","textChars":4,"textLines":1,"bbox":[714,430,42,26]}
+{"kind":"textbox","id":"sh/gbq1oryt","slide":3,"name":"status-factor-7","text":"Concurrency","textPreview":"Concurrency","textChars":11,"textLines":1,"bbox":[760,430,220,26]}
+{"kind":"textbox","id":"sh/5wjudg7a","slide":3,"name":"status-label-7","text":"Parcial","textPreview":"Parcial","textChars":7,"textLines":1,"bbox":[1010,430,180,26]}
+{"kind":"shape","id":"sh/y90je9cv","slide":3,"name":"status-line-8","bbox":[690,495,500,1]}
+{"kind":"shape","id":"sh/nuxc3ylc","slide":3,"name":"status-dot-8","bbox":[690,473,14,14]}
+{"kind":"textbox","id":"sh/cbulwval","slide":3,"name":"status-roman-8","text":"IX","textPreview":"IX","textChars":2,"textLines":1,"bbox":[714,466,42,26]}
+{"kind":"textbox","id":"sh/5sneloj2","slide":3,"name":"status-factor-8","text":"Disposability","textPreview":"Disposability","textChars":13,"textLines":1,"bbox":[760,466,220,26]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":3,"name":"status-label-8","text":"Aderente","textPreview":"Aderente","textChars":8,"textLines":1,"bbox":[1010,466,180,26]}
+{"kind":"shape","id":"sh/g3ex0nux","slide":3,"name":"status-line-9","bbox":[690,531,500,1]}
+{"kind":"shape","id":"sh/nih4byhg","slide":3,"name":"status-dot-9","bbox":[690,509,14,14]}
+{"kind":"textbox","id":"sh/yxobm58z","slide":3,"name":"status-roman-9","text":"X","textPreview":"X","textChars":1,"textLines":1,"bbox":[714,502,42,26]}
+{"kind":"textbox","id":"sh/9cvixcze","slide":3,"name":"status-factor-9","text":"Dev/prod parity","textPreview":"Dev/prod parity","textChars":15,"textLines":1,"bbox":[760,502,220,26]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":3,"name":"status-label-9","text":"Parcial","textPreview":"Parcial","textChars":7,"textLines":1,"bbox":[1010,502,180,26]}
+{"kind":"shape","id":"sh/r65wjudg","slide":3,"name":"status-line-10","bbox":[690,567,500,1]}
+{"kind":"shape","id":"sh/ylc7u54z","slide":3,"name":"status-dot-10","bbox":[690,545,14,14]}
+{"kind":"textbox","id":"sh/90je9cvi","slide":3,"name":"status-roman-10","text":"XI","textPreview":"XI","textChars":2,"textLines":1,"bbox":[714,538,42,26]}
+{"kind":"textbox","id":"sh/gfmlkjm1","slide":3,"name":"status-factor-10","text":"Logs","textPreview":"Logs","textChars":4,"textLines":1,"bbox":[760,538,220,26]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":3,"name":"status-label-10","text":"Aderente","textPreview":"Aderente","textChars":8,"textLines":1,"bbox":[1010,538,180,26]}
+{"kind":"shape","id":"sh/zidonyd0","slide":3,"name":"status-line-11","bbox":[690,603,500,1]}
+{"kind":"shape","id":"sh/s36hcrmh","slide":3,"name":"status-dot-11","bbox":[690,581,14,14]}
+{"kind":"textbox","id":"sh/hoza1gvy","slide":3,"name":"status-roman-11","text":"XII","textPreview":"XII","textChars":3,"textLines":1,"bbox":[714,574,42,26]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":3,"name":"status-factor-11","text":"Admin processes","textPreview":"Admin processes","textChars":15,"textLines":1,"bbox":[760,574,220,26]}
+{"kind":"textbox","id":"sh/za1gvy90","slide":3,"name":"status-label-11","text":"Quase aderente","textPreview":"Quase aderente","textChars":14,"textLines":1,"bbox":[1010,574,180,26]}
+{"kind":"textbox","id":"sh/svu9knih","slide":3,"name":"source","text":"Fonte: TWELVE_FACTOR.md; compose.yml; .env.example; config-repository/config/*; Dockerfiles","textPreview":"Fonte: TWELVE_FACTOR.md; compose.yml; .env.example; config-repository/config/*; Dockerfiles","textChars":91,"textLines":1,"bbox":[41,662,880,25]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":3,"name":"slide-number","text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[1184,659,54,25]}
+{"kind":"notes","id":"nt/migdy8","slide":3,"text":""}
+{"kind":"slide","id":"sl/qj2ivj","slide":4,"title":"I-III: código e configuração estão controlados, com exceções assumidas","textShapes":22}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":4,"name":"title","text":"I-III: código e configuração estão controlados, com exceções assumidas","textPreview":"I-III: código e configuração estão controlados, com exceções assumidas","textChars":70,"textLines":1,"bbox":[41,36,1198,78]}
+{"kind":"textbox","id":"sh/fyxobm58","slide":4,"name":"subtitle","text":"O projeto troca pureza de microserviços por atomicidade acadêmica e usa Config Server como parte explícita da arquitetura distribuída.","textPreview":"O projeto troca pureza de microserviços por atomicidade acadêmica e usa Config Server como parte explícita da arquitetura distribuída.","textChars":134,"textLines":1,"bbox":[42,118,950,54]}
+{"kind":"shape","id":"sh/qd4vmtwr","slide":4,"name":"factor-1-panel","bbox":[41,214,374,408]}
+{"kind":"shape","id":"sh/xczed8v6","slide":4,"name":"factor-1-statusbar","bbox":[41,214,7,408]}
+{"kind":"textbox","id":"sh/8v6psfil","slide":4,"name":"factor-1-name","text":"I. Codebase","textPreview":"I. Codebase","textChars":11,"textLines":1,"bbox":[65,236,326,34]}
+{"kind":"shape","id":"sh/fa9w3m94","slide":4,"name":"factor-1-badge-mark","bbox":[65,274,13,13]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":4,"name":"factor-1-badge-label","text":"Parcial","textPreview":"Parcial","textChars":7,"textLines":1,"bbox":[85,269,210,28]}
+{"kind":"textbox","id":"sh/1gvy90je","slide":4,"name":"factor-1-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[65,294,110,22]}
+{"kind":"textbox","id":"sh/8z25kb6x","slide":4,"name":"factor-1-evidence","text":"Um único repositório Git gera imagens separadas por módulo Maven.\nOs módulos não compartilham estado de runtime.","textPreview":"Um único repositório Git gera imagens separadas por módulo Maven. | Os módulos não compartilham estado de runtime.","textChars":112,"textLines":2,"bbox":[65,320,326,86]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":4,"name":"factor-1-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[65,414,110,22]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":4,"name":"factor-1-attention","text":"Não segue um repo por serviço.\nA escolha mantém sistema, config e versão juntos.","textPreview":"Não segue um repo por serviço. | A escolha mantém sistema, config e versão juntos.","textChars":80,"textLines":2,"bbox":[65,440,326,74]}
+{"kind":"shape","id":"sh/sfil0rqd","slide":4,"name":"factor-2-panel","bbox":[453,214,374,408]}
+{"kind":"shape","id":"sh/h0fepkzu","slide":4,"name":"factor-2-statusbar","bbox":[453,214,7,408]}
+{"kind":"textbox","id":"sh/al87ed8b","slide":4,"name":"factor-2-name","text":"II. Dependencies","textPreview":"II. Dependencies","textChars":16,"textLines":1,"bbox":[477,236,326,34]}
+{"kind":"shape","id":"sh/z61032ls","slide":4,"name":"factor-2-badge-mark","bbox":[477,274,13,13]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":4,"name":"factor-2-badge-label","text":"Aderente","textPreview":"Aderente","textChars":8,"textLines":1,"bbox":[497,269,210,28]}
+{"kind":"textbox","id":"sh/hcrmhk3q","slide":4,"name":"factor-2-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[477,294,110,22]}
+{"kind":"textbox","id":"sh/6xkf6dcb","slide":4,"name":"factor-2-evidence","text":"Maven wrapper, BOMs, Enforcer e Dockerfiles multi-stage declaram dependências.\nImagens base têm versões e vários digests fixos.","textPreview":"Maven wrapper, BOMs, Enforcer e Dockerfiles multi-stage declaram dependências. | Imagens base têm versões e vários digests fixos.","textChars":127,"textLines":2,"bbox":[477,320,326,86]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":4,"name":"factor-2-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[477,414,110,22]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":4,"name":"factor-2-attention","text":"Modelo Ollama usa tag local.\nRevalidar quando o volume do modelo for recriado.","textPreview":"Modelo Ollama usa tag local. | Revalidar quando o volume do modelo for recriado.","textChars":78,"textLines":2,"bbox":[477,440,326,74]}
+{"kind":"shape","id":"sh/yxobm58z","slide":4,"name":"factor-3-panel","bbox":[864,214,374,408]}
+{"kind":"shape","id":"sh/5o7qpg3e","slide":4,"name":"factor-3-statusbar","bbox":[864,214,7,408]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":4,"name":"factor-3-name","text":"III. Config","textPreview":"III. Config","textChars":11,"textLines":1,"bbox":[888,236,326,34]}
+{"kind":"shape","id":"sh/r65wjudg","slide":4,"name":"factor-3-badge-mark","bbox":[888,274,13,13]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":4,"name":"factor-3-badge-label","text":"Pragmático","textPreview":"Pragmático","textChars":10,"textLines":1,"bbox":[908,269,210,28]}
+{"kind":"textbox","id":"sh/9cvixcze","slide":4,"name":"factor-3-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[888,294,110,22]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":4,"name":"factor-3-evidence","text":"Segredos entram por variáveis de ambiente.\nConfig Server guarda política não secreta e URLs sobrescrevíveis.","textPreview":"Segredos entram por variáveis de ambiente. | Config Server guarda política não secreta e URLs sobrescrevíveis.","textChars":108,"textLines":2,"bbox":[888,320,326,86]}
+{"kind":"textbox","id":"sh/rytsvu9k","slide":4,"name":"factor-3-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[888,414,110,22]}
+{"kind":"textbox","id":"sh/yd0z6103","slide":4,"name":"factor-3-attention","text":"Não é env-only.\n.env é apenas contrato local do Compose.","textPreview":"Não é env-only. | .env é apenas contrato local do Compose.","textChars":56,"textLines":2,"bbox":[888,440,326,74]}
+{"kind":"textbox","id":"sh/svu9knih","slide":4,"name":"source","text":"Fonte: pom.xml; .env.example; compose.yml; config-repository/config/*; Dockerfiles","textPreview":"Fonte: pom.xml; .env.example; compose.yml; config-repository/config/*; Dockerfiles","textChars":82,"textLines":1,"bbox":[41,662,880,25]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":4,"name":"slide-number","text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[1184,659,54,25]}
+{"kind":"notes","id":"nt/qj2ivj","slide":4,"text":""}
+{"kind":"slide","id":"sl/u6b0nn","slide":5,"title":"IV-VI: o estado fica acoplado aos backing services, não aos containers Java","textShapes":22}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":5,"name":"title","text":"IV-VI: o estado fica acoplado aos backing services, não aos containers Java","textPreview":"IV-VI: o estado fica acoplado aos backing services, não aos containers Java","textChars":75,"textLines":1,"bbox":[41,36,1198,78]}
+{"kind":"textbox","id":"sh/m1cfa9w3","slide":5,"name":"subtitle","text":"O desenho permite trocar anexos por configuração e substituir réplicas de aplicação sem preservar filesystem local.","textPreview":"O desenho permite trocar anexos por configuração e substituir réplicas de aplicação sem preservar filesystem local.","textChars":115,"textLines":1,"bbox":[42,118,950,54]}
+{"kind":"shape","id":"sh/bm58z25k","slide":5,"name":"factor-4-panel","bbox":[41,214,374,408]}
+{"kind":"shape","id":"sh/4vmtwra5","slide":5,"name":"factor-4-statusbar","bbox":[41,214,7,408]}
+{"kind":"textbox","id":"sh/tgfmlkjm","slide":5,"name":"factor-4-name","text":"IV. Backing services","textPreview":"IV. Backing services","textChars":20,"textLines":1,"bbox":[65,236,326,34]}
+{"kind":"shape","id":"sh/mp0bi9s3","slide":5,"name":"factor-4-badge-mark","bbox":[65,274,13,13]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":5,"name":"factor-4-badge-label","text":"Aderente","textPreview":"Aderente","textChars":8,"textLines":1,"bbox":[85,269,210,28]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":5,"name":"factor-4-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[65,294,110,22]}
+{"kind":"textbox","id":"sh/t83itgfm","slide":5,"name":"factor-4-evidence","text":"PostgreSQL, Ollama, Groq, Tavily, Eureka, Zipkin, Prometheus e Config Git entram por handles configuráveis.\nTrocar URL ou credencial não exige rebuild da app.","textPreview":"PostgreSQL, Ollama, Groq, Tavily, Eureka, Zipkin, Prometheus e Config Git entram por handles configuráveis. | Trocar URL ou credencial nã...","textChars":158,"textLines":2,"bbox":[65,320,326,86]}
+{"kind":"textbox","id":"sh/9gr2p8nq","slide":5,"name":"factor-4-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[65,414,110,22]}
+{"kind":"textbox","id":"sh/gvy90je9","slide":5,"name":"factor-4-attention","text":"Compose traz defaults locais.\nAmbientes reais devem substituir os anexos.","textPreview":"Compose traz defaults locais. | Ambientes reais devem substituir os anexos.","textChars":73,"textLines":2,"bbox":[65,440,326,74]}
+{"kind":"shape","id":"sh/ra5gbq1o","slide":5,"name":"factor-5-panel","bbox":[453,214,374,408]}
+{"kind":"shape","id":"sh/2p8nqxs7","slide":5,"name":"factor-5-statusbar","bbox":[453,214,7,408]}
+{"kind":"textbox","id":"sh/94fu18jq","slide":5,"name":"factor-5-name","text":"V. Build, release, run","textPreview":"V. Build, release, run","textChars":22,"textLines":1,"bbox":[477,236,326,34]}
+{"kind":"shape","id":"sh/kjm1cfa9","slide":5,"name":"factor-5-badge-mark","bbox":[477,274,13,13]}
+{"kind":"textbox","id":"sh/r2p8nqxs","slide":5,"name":"factor-5-badge-label","text":"Parcial","textPreview":"Parcial","textChars":7,"textLines":1,"bbox":[497,269,210,28]}
+{"kind":"textbox","id":"sh/2hwfyxob","slide":5,"name":"factor-5-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[477,294,110,22]}
+{"kind":"textbox","id":"sh/9w3m94fu","slide":5,"name":"factor-5-evidence","text":"Maven verifica; docker compose build cria imagens com labels de versão e revisão.\nRunbook recomenda executar com up --no-build.","textPreview":"Maven verifica; docker compose build cria imagens com labels de versão e revisão. | Runbook recomenda executar com up --no-build.","textChars":127,"textLines":2,"bbox":[477,320,326,86]}
+{"kind":"textbox","id":"sh/kb6xkf6d","slide":5,"name":"factor-5-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[477,414,110,22]}
+{"kind":"textbox","id":"sh/0z61032l","slide":5,"name":"factor-5-attention","text":"Compose não registra promoção imutável.\nOperadores precisam preservar tags e revisão.","textPreview":"Compose não registra promoção imutável. | Operadores precisam preservar tags e revisão.","textChars":85,"textLines":2,"bbox":[477,440,326,74]}
+{"kind":"shape","id":"sh/pkzupwb2","slide":5,"name":"factor-6-panel","bbox":[864,214,374,408]}
+{"kind":"shape","id":"sh/itgfmlkj","slide":5,"name":"factor-6-statusbar","bbox":[864,214,7,408]}
+{"kind":"textbox","id":"sh/7ed8bat4","slide":5,"name":"factor-6-name","text":"VI. Processes","textPreview":"VI. Processes","textChars":13,"textLines":1,"bbox":[888,236,326,34]}
+{"kind":"shape","id":"sh/0nuxc3yl","slide":5,"name":"factor-6-badge-mark","bbox":[888,274,13,13]}
+{"kind":"textbox","id":"sh/p8nqxs72","slide":5,"name":"factor-6-badge-label","text":"Aderente nas apps","textPreview":"Aderente nas apps","textChars":17,"textLines":1,"bbox":[908,269,210,28]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":5,"name":"factor-6-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[888,294,110,22]}
+{"kind":"textbox","id":"sh/72x4nap4","slide":5,"name":"factor-6-evidence","text":"Containers Java não guardam estado de negócio no filesystem.\nChat memory e vetores ficam no PostgreSQL; modelos ficam no volume Ollama.","textPreview":"Containers Java não guardam estado de negócio no filesystem. | Chat memory e vetores ficam no PostgreSQL; modelos ficam no volume Ollama.","textChars":135,"textLines":2,"bbox":[888,320,326,86]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":5,"name":"factor-6-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[888,414,110,22]}
+{"kind":"textbox","id":"sh/p4r65wju","slide":5,"name":"factor-6-attention","text":"PostgreSQL, Ollama, Prometheus e Grafana continuam stateful por natureza.\nA avaliação separa app e infraestrutura.","textPreview":"PostgreSQL, Ollama, Prometheus e Grafana continuam stateful por natureza. | A avaliação separa app e infraestrutura.","textChars":114,"textLines":2,"bbox":[888,440,326,74]}
+{"kind":"textbox","id":"sh/f6dcbulw","slide":5,"name":"source","text":"Fonte: compose.yml; RUNBOOK.md; RagService/Dockerfile; TWELVE_FACTOR.md","textPreview":"Fonte: compose.yml; RUNBOOK.md; RagService/Dockerfile; TWELVE_FACTOR.md","textChars":71,"textLines":1,"bbox":[41,662,880,25]}
+{"kind":"textbox","id":"sh/mlkjm1cf","slide":5,"name":"slide-number","text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[1184,659,54,25]}
+{"kind":"notes","id":"nt/u6b0nn","slide":5,"text":""}
+{"kind":"slide","id":"sl/786t3w","slide":6,"title":"VII-IX: portas e descarte estão maduros; concorrência ainda é local","textShapes":22}
+{"kind":"textbox","id":"sh/3m94fu18","slide":6,"name":"title","text":"VII-IX: portas e descarte estão maduros; concorrência ainda é local","textPreview":"VII-IX: portas e descarte estão maduros; concorrência ainda é local","textChars":67,"textLines":1,"bbox":[41,36,1198,78]}
+{"kind":"textbox","id":"sh/s72x4nap","slide":6,"name":"subtitle","text":"A arquitetura replica processos stateless, mas ainda depende de instâncias únicas para alguns componentes e backing services pesados.","textPreview":"A arquitetura replica processos stateless, mas ainda depende de instâncias únicas para alguns componentes e backing services pesados.","textChars":133,"textLines":1,"bbox":[42,118,950,54]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":6,"name":"factor-7-panel","bbox":[41,214,374,408]}
+{"kind":"shape","id":"sh/adsji5sn","slide":6,"name":"factor-7-statusbar","bbox":[41,214,7,408]}
+{"kind":"textbox","id":"sh/3ylc7u54","slide":6,"name":"factor-7-name","text":"VII. Port binding","textPreview":"VII. Port binding","textChars":17,"textLines":1,"bbox":[65,236,326,34]}
+{"kind":"shape","id":"sh/sji5snel","slide":6,"name":"factor-7-badge-mark","bbox":[65,274,13,13]}
+{"kind":"textbox","id":"sh/h4byhgn2","slide":6,"name":"factor-7-badge-label","text":"Aderente nas apps","textPreview":"Aderente nas apps","textChars":17,"textLines":1,"bbox":[85,269,210,28]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":6,"name":"factor-7-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[65,294,110,22]}
+{"kind":"textbox","id":"sh/za1gvy90","slide":6,"name":"factor-7-evidence","text":"Cada serviço Java usa server.port=${PORT}.\nHTTP é exposto diretamente pelo processo; só edge e UIs operacionais são publicados no localhost.","textPreview":"Cada serviço Java usa server.port=${PORT}. | HTTP é exposto diretamente pelo processo; só edge e UIs operacionais são publicados no local...","textChars":140,"textLines":2,"bbox":[65,320,326,86]}
+{"kind":"textbox","id":"sh/z61032ls","slide":6,"name":"factor-7-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[65,414,110,22]}
+{"kind":"textbox","id":"sh/al87ed8b","slide":6,"name":"factor-7-attention","text":"Imagens de terceiros preservam portas internas padrão.\nIsso fica na fronteira do attachment.","textPreview":"Imagens de terceiros preservam portas internas padrão. | Isso fica na fronteira do attachment.","textChars":92,"textLines":2,"bbox":[65,440,326,74]}
+{"kind":"shape","id":"sh/hcrmhk3q","slide":6,"name":"factor-8-panel","bbox":[453,214,374,408]}
+{"kind":"shape","id":"sh/orytsvu9","slide":6,"name":"factor-8-statusbar","bbox":[453,214,7,408]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":6,"name":"factor-8-name","text":"VIII. Concurrency","textPreview":"VIII. Concurrency","textChars":17,"textLines":1,"bbox":[477,236,326,34]}
+{"kind":"shape","id":"sh/a9w3m94f","slide":6,"name":"factor-8-badge-mark","bbox":[477,274,13,13]}
+{"kind":"textbox","id":"sh/h0fepkzu","slide":6,"name":"factor-8-badge-label","text":"Parcial","textPreview":"Parcial","textChars":7,"textLines":1,"bbox":[497,269,210,28]}
+{"kind":"textbox","id":"sh/sfil0rqd","slide":6,"name":"factor-8-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[477,294,110,22]}
+{"kind":"textbox","id":"sh/zqtcj6to","slide":6,"name":"factor-8-evidence","text":"Gateway, Question Service, RAG, Eureka e HAProxy escalam adicionando processos.\nEstado externo torna réplicas intercambiáveis.","textPreview":"Gateway, Question Service, RAG, Eureka e HAProxy escalam adicionando processos. | Estado externo torna réplicas intercambiáveis.","textChars":126,"textLines":2,"bbox":[477,320,326,86]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":6,"name":"factor-8-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[477,414,110,22]}
+{"kind":"textbox","id":"sh/ed8bat47","slide":6,"name":"factor-8-attention","text":"PostgreSQL e Ollama são únicos.\nNormalizer e MCP ficam single replica; limites Groq por processo.","textPreview":"PostgreSQL e Ollama são únicos. | Normalizer e MCP ficam single replica; limites Groq por processo.","textChars":97,"textLines":2,"bbox":[477,440,326,74]}
+{"kind":"shape","id":"sh/7u54zido","slide":6,"name":"factor-9-panel","bbox":[864,214,374,408]}
+{"kind":"shape","id":"sh/wfyxobm5","slide":6,"name":"factor-9-statusbar","bbox":[864,214,7,408]}
+{"kind":"textbox","id":"sh/l0rqd4vm","slide":6,"name":"factor-9-name","text":"IX. Disposability","textPreview":"IX. Disposability","textChars":17,"textLines":1,"bbox":[888,236,326,34]}
+{"kind":"shape","id":"sh/eloj2t83","slide":6,"name":"factor-9-badge-mark","bbox":[888,274,13,13]}
+{"kind":"textbox","id":"sh/36hcrmhk","slide":6,"name":"factor-9-badge-label","text":"Aderente","textPreview":"Aderente","textChars":8,"textLines":1,"bbox":[908,269,210,28]}
+{"kind":"textbox","id":"sh/wra5gbq1","slide":6,"name":"factor-9-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[888,294,110,22]}
+{"kind":"textbox","id":"sh/lc7u54zi","slide":6,"name":"factor-9-evidence","text":"Spring tem graceful shutdown; Compose define stop grace period, healthchecks e restart bounded.\nIngestão é idempotente por checksum.","textPreview":"Spring tem graceful shutdown; Compose define stop grace period, healthchecks e restart bounded. | Ingestão é idempotente por checksum.","textChars":132,"textLines":2,"bbox":[888,320,326,86]}
+{"kind":"textbox","id":"sh/epkzupwb","slide":6,"name":"factor-9-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[888,414,110,22]}
+{"kind":"textbox","id":"sh/7adsji5s","slide":6,"name":"factor-9-attention","text":"Ollama pode demorar no cold start.\nÉ custo do backing service de modelo, não dos serviços Java.","textPreview":"Ollama pode demorar no cold start. | É custo do backing service de modelo, não dos serviços Java.","textChars":95,"textLines":2,"bbox":[888,440,326,74]}
+{"kind":"textbox","id":"sh/tgfmlkjm","slide":6,"name":"source","text":"Fonte: application.properties dos módulos; compose.yml; CorpusIngestionRunner.java","textPreview":"Fonte: application.properties dos módulos; compose.yml; CorpusIngestionRunner.java","textChars":82,"textLines":1,"bbox":[41,662,880,25]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":6,"name":"slide-number","text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[1184,659,54,25]}
+{"kind":"notes","id":"nt/786t3w","slide":6,"text":""}
+{"kind":"slide","id":"sl/yjoers","slide":7,"title":"X-XII: a operação fecha o ciclo, mas produção exigiria mais plataforma","textShapes":22}
+{"kind":"textbox","id":"sh/mlkjm1cf","slide":7,"name":"title","text":"X-XII: a operação fecha o ciclo, mas produção exigiria mais plataforma","textPreview":"X-XII: a operação fecha o ciclo, mas produção exigiria mais plataforma","textChars":70,"textLines":1,"bbox":[41,36,1198,78]}
+{"kind":"textbox","id":"sh/xc3ylc7u","slide":7,"name":"subtitle","text":"Logs e processos administrativos seguem o espírito Twelve-Factor; paridade e governança de tarefas ainda dependem do destino de deploy.","textPreview":"Logs e processos administrativos seguem o espírito Twelve-Factor; paridade e governança de tarefas ainda dependem do destino de deploy.","textChars":135,"textLines":1,"bbox":[42,118,950,54]}
+{"kind":"shape","id":"sh/4r65wjud","slide":7,"name":"factor-10-panel","bbox":[41,214,374,408]}
+{"kind":"shape","id":"sh/fepkzupw","slide":7,"name":"factor-10-statusbar","bbox":[41,214,7,408]}
+{"kind":"textbox","id":"sh/mtwra5gb","slide":7,"name":"factor-10-name","text":"X. Dev/prod parity","textPreview":"X. Dev/prod parity","textChars":18,"textLines":1,"bbox":[65,236,326,34]}
+{"kind":"shape","id":"sh/xkf6dcbu","slide":7,"name":"factor-10-badge-mark","bbox":[65,274,13,13]}
+{"kind":"textbox","id":"sh/4zidonyd","slide":7,"name":"factor-10-badge-label","text":"Parcial","textPreview":"Parcial","textChars":7,"textLines":1,"bbox":[85,269,210,28]}
+{"kind":"textbox","id":"sh/fil0rqd4","slide":7,"name":"factor-10-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[65,294,110,22]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":7,"name":"factor-10-evidence","text":"Compose usa as mesmas imagens, protocolos, schema PGVector e contrato de ambiente.\nTestes isolam dependências externas com dublês.","textPreview":"Compose usa as mesmas imagens, protocolos, schema PGVector e contrato de ambiente. | Testes isolam dependências externas com dublês.","textChars":130,"textLines":2,"bbox":[65,320,326,86]}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":7,"name":"factor-10-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[65,414,110,22]}
+{"kind":"textbox","id":"sh/pwb2hwfy","slide":7,"name":"factor-10-attention","text":"Local não reproduz capacidade, latência ou cotas de Groq/Ollama/infra real.\nPrecisa teste em ambiente mais parecido com produção.","textPreview":"Local não reproduz capacidade, latência ou cotas de Groq/Ollama/infra real. | Precisa teste em ambiente mais parecido com produção.","textChars":129,"textLines":2,"bbox":[65,440,326,74]}
+{"kind":"shape","id":"sh/i5sneloj","slide":7,"name":"factor-11-panel","bbox":[453,214,374,408]}
+{"kind":"shape","id":"sh/7qpg3ex0","slide":7,"name":"factor-11-statusbar","bbox":[453,214,7,408]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":7,"name":"factor-11-name","text":"XI. Logs","textPreview":"XI. Logs","textChars":8,"textLines":1,"bbox":[477,236,326,34]}
+{"kind":"shape","id":"sh/p4r65wju","slide":7,"name":"factor-11-badge-mark","bbox":[477,274,13,13]}
+{"kind":"textbox","id":"sh/ed8v6psf","slide":7,"name":"factor-11-badge-label","text":"Aderente","textPreview":"Aderente","textChars":8,"textLines":1,"bbox":[497,269,210,28]}
+{"kind":"textbox","id":"sh/7y1kre1w","slide":7,"name":"factor-11-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[477,294,110,22]}
+{"kind":"textbox","id":"sh/0nuxc3yl","slide":7,"name":"factor-11-evidence","text":"Spring e HAProxy escrevem streams em stdout/stderr.\nPadrões incluem aplicação, traceId e spanId; Zipkin e Prometheus complementam observabilidade.","textPreview":"Spring e HAProxy escrevem streams em stdout/stderr. | Padrões incluem aplicação, traceId e spanId; Zipkin e Prometheus complementam obser...","textChars":146,"textLines":2,"bbox":[477,320,326,86]}
+{"kind":"textbox","id":"sh/p8nqxs72","slide":7,"name":"factor-11-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[477,414,110,22]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":7,"name":"factor-11-attention","text":"Compose local não retém logs centralizados.\nA plataforma deve coletar e reter.","textPreview":"Compose local não retém logs centralizados. | A plataforma deve coletar e reter.","textChars":78,"textLines":2,"bbox":[477,440,326,74]}
+{"kind":"shape","id":"sh/kre1w7mp","slide":7,"name":"factor-12-panel","bbox":[864,214,374,408]}
+{"kind":"shape","id":"sh/val87ed8","slide":7,"name":"factor-12-statusbar","bbox":[864,214,7,408]}
+{"kind":"textbox","id":"sh/6psfil0r","slide":7,"name":"factor-12-name","text":"XII. Admin processes","textPreview":"XII. Admin processes","textChars":20,"textLines":1,"bbox":[888,236,326,34]}
+{"kind":"shape","id":"sh/donyd0z6","slide":7,"name":"factor-12-badge-mark","bbox":[888,274,13,13]}
+{"kind":"textbox","id":"sh/k3q5o7qp","slide":7,"name":"factor-12-badge-label","text":"Quase aderente","textPreview":"Quase aderente","textChars":14,"textLines":1,"bbox":[908,269,210,28]}
+{"kind":"textbox","id":"sh/vixczed8","slide":7,"name":"factor-12-evidence-label","text":"Como aparece","textPreview":"Como aparece","textChars":12,"textLines":1,"bbox":[888,294,110,22]}
+{"kind":"textbox","id":"sh/2x4nap4r","slide":7,"name":"factor-12-evidence","text":"rag-ingestion roda a mesma imagem RAG versionada como tarefa one-off.\nExecução é idempotente pelo checksum do corpus.","textPreview":"rag-ingestion roda a mesma imagem RAG versionada como tarefa one-off. | Execução é idempotente pelo checksum do corpus.","textChars":117,"textLines":2,"bbox":[888,320,326,86]}
+{"kind":"textbox","id":"sh/d0z61032","slide":7,"name":"factor-12-attention-label","text":"Ponto de atenção","textPreview":"Ponto de atenção","textChars":16,"textLines":1,"bbox":[888,414,110,22]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":7,"name":"factor-12-attention","text":"Reset de vetores usa imagem PostgreSQL; pull de modelo usa Ollama.\nIsso evita a aplicação destruir o próprio schema vivo.","textPreview":"Reset de vetores usa imagem PostgreSQL; pull de modelo usa Ollama. | Isso evita a aplicação destruir o próprio schema vivo.","textChars":121,"textLines":2,"bbox":[888,440,326,74]}
+{"kind":"textbox","id":"sh/y90je9cv","slide":7,"name":"source","text":"Fonte: config-repository/config/*; compose.yml; RUNBOOK.md; CorpusIngestionRunner.java","textPreview":"Fonte: config-repository/config/*; compose.yml; RUNBOOK.md; CorpusIngestionRunner.java","textChars":86,"textLines":1,"bbox":[41,662,880,25]}
+{"kind":"textbox","id":"sh/nuxc3ylc","slide":7,"name":"slide-number","text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[1184,659,54,25]}
+{"kind":"notes","id":"nt/yjoers","slide":7,"text":""}
+{"kind":"slide","id":"sl/odl1mu","slide":8,"title":"Para ficar mais Twelve-Factor, o próximo avanço é plataforma","textShapes":11}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":8,"name":"title","text":"Para ficar mais Twelve-Factor, o próximo avanço é plataforma","textPreview":"Para ficar mais Twelve-Factor, o próximo avanço é plataforma","textChars":60,"textLines":1,"bbox":[41,36,1198,78]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":8,"name":"subtitle","text":"O código já aponta na direção certa; o maior ganho viria de um caminho de release e operação menos dependente de Compose local.","textPreview":"O código já aponta na direção certa; o maior ganho viria de um caminho de release e operação menos dependente de Compose local.","textChars":127,"textLines":1,"bbox":[42,118,950,54]}
+{"kind":"shape","id":"sh/il0rqd4v","slide":8,"name":"close-left-square","bbox":[35,360,34,38]}
+{"kind":"shape","id":"sh/t47y1kre","slide":8,"name":"close-mid-square","bbox":[449,360,33,37]}
+{"kind":"shape","id":"sh/0je9cvix","slide":8,"name":"close-right-square","bbox":[862,365,36,28]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":8,"name":"close-1-title","text":"1. Formalizar release","textPreview":"1. Formalizar release","textChars":21,"textLines":1,"bbox":[41,438,330,56]}
+{"kind":"textbox","id":"sh/idonyd0z","slide":8,"name":"close-1-body","text":"Publicar imagens em registry.\nUsar tags imutáveis, manifesto de release e execução sempre sem rebuild.","textPreview":"Publicar imagens em registry. | Usar tags imutáveis, manifesto de release e execução sempre sem rebuild.","textChars":102,"textLines":2,"bbox":[41,501,330,94]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":8,"name":"close-2-title","text":"2. Aproximar produção","textPreview":"2. Aproximar produção","textChars":21,"textLines":1,"bbox":[453,438,330,56]}
+{"kind":"textbox","id":"sh/0fepkzup","slide":8,"name":"close-2-body","text":"Testar com Postgres/Ollama equivalentes ao destino real.\nEscalar Normalizer e MCP se a carga pedir.","textPreview":"Testar com Postgres/Ollama equivalentes ao destino real. | Escalar Normalizer e MCP se a carga pedir.","textChars":99,"textLines":2,"bbox":[453,501,330,94]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":8,"name":"close-3-title","text":"3. Fechar observabilidade","textPreview":"3. Fechar observabilidade","textChars":25,"textLines":1,"bbox":[864,438,330,56]}
+{"kind":"textbox","id":"sh/7ed8bat4","slide":8,"name":"close-3-body","text":"Enviar logs para armazenamento centralizado.\nRevalidar a matriz ao adicionar serviço, volume ou processo admin.","textPreview":"Enviar logs para armazenamento centralizado. | Revalidar a matriz ao adicionar serviço, volume ou processo admin.","textChars":111,"textLines":2,"bbox":[864,501,330,94]}
+{"kind":"shape","id":"sh/0z61032l","slide":8,"name":"close-rule","bbox":[41,622,760,2]}
+{"kind":"textbox","id":"sh/pkzupwb2","slide":8,"name":"close-final","text":"Síntese: o projeto aplica bem os fatores nas aplicações; as exceções são conscientes e devem ser tratadas como decisões arquiteturais documentadas.","textPreview":"Síntese: o projeto aplica bem os fatores nas aplicações; as exceções são conscientes e devem ser tratadas como decisões arquiteturais doc...","textChars":147,"textLines":1,"bbox":[41,642,900,34]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":8,"name":"source","text":"Fonte: TWELVE_FACTOR.md; compose.yml; .env.example; config-repository/config/*; Dockerfiles","textPreview":"Fonte: TWELVE_FACTOR.md; compose.yml; .env.example; config-repository/config/*; Dockerfiles","textChars":91,"textLines":1,"bbox":[41,662,880,25]}
+{"kind":"textbox","id":"sh/72x4nap4","slide":8,"name":"slide-number","text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[1184,659,54,25]}
+{"kind":"notes","id":"nt/odl1mu","slide":8,"text":""}
